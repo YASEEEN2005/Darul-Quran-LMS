@@ -1,0 +1,108 @@
+===========================================================
+LMS Backend API Routes Documentation (MongoDB Atlas)
+===========================================================
+Base URL (Local): http://localhost:5001
+
+-----------------------------------------------------------
+1. AUTHENTICATION ROUTES (/auth)
+-----------------------------------------------------------
+[GET]  /auth/google
+       Initiates the Google OAuth 2.0 login flow. Redirects to Google consent screen.
+
+[GET]  /auth/google/callback
+       Handles Google's redirect. Verifies profile.
+       - Success behavior: Redirects to FRONTEND_URL/login-success?token=JWTxyz
+       - Failure behavior: Redirects to FRONTEND_URL/login?error=reason
+
+-----------------------------------------------------------
+2. USER MANAGEMENT (/users)
+-----------------------------------------------------------
+[GET]  /users
+       Desc: Get all system users.
+       Auth: Private (Admin Only)
+       Header: Authorization: Bearer <token>
+
+[POST] /users
+       Desc: Whitelist/create a new user account.
+       Auth: Private (Admin Only)
+       Body: { email: String, name: String, role?: 'STUDENT'|'ADMIN', approved?: Boolean }
+
+[PATCH] /users/:id/approve
+       Desc: Approve a specific user so they can log in.
+       Auth: Private (Admin Only)
+
+-----------------------------------------------------------
+3. COURSE ROUTES (/courses)
+-----------------------------------------------------------
+[GET]  /courses
+       Desc: Get all courses with their lesson/exam counts.
+       Auth: Private (User/Student)
+
+[POST] /courses
+       Desc: Create a new course.
+       Auth: Private (Admin Only)
+       Body: { title: String, description?: String }
+
+-----------------------------------------------------------
+4. LESSON ROUTES (/lessons)
+-----------------------------------------------------------
+[GET]  /lessons/:courseId
+       Desc: Get lessons for a specific course, enforcing sequential unlocking based on the user's progress.
+       Auth: Private (User/Student)
+
+[POST] /lessons
+       Desc: Add a new video lesson to a course.
+       Auth: Private (Admin Only)
+       Body: { courseId: String(ObjectId), title: String, videoUrl: String, orderIndex: Number }
+
+[POST] /lessons/:id/complete
+       Desc: Mark a specific lesson as completed (watched) for the logged-in user.
+       Auth: Private (User/Student)
+
+-----------------------------------------------------------
+5. EXAM ROUTES (/exams)
+-----------------------------------------------------------
+[GET]  /exams/:courseId
+       Desc: Get exams for a specific course, enforcing sequential unlocking.
+       Auth: Private (User/Student)
+
+[POST] /exams
+       Desc: Create a new exam with multiple questions.
+       Auth: Private (Admin Only)
+       Body: 
+       { 
+         courseId: String(ObjectId), 
+         title: String, 
+         orderIndex: Number,
+         questions: [
+           { text: String, options: [String], correctOptionIndex: Number }
+         ]
+       }
+
+[POST] /exams/:id/submit
+       Desc: Submit an exam for auto-grading.
+       Auth: Private (User/Student)
+       Body: { answers: [ { questionId: String(ObjectId), selectedOptionIndex: Number } ] }
+       Returns: { success: true, score: Number, data: ExamResult }
+
+-----------------------------------------------------------
+6. PROGRESS ROUTES (/progress)
+-----------------------------------------------------------
+[GET]  /progress/:userId
+       Desc: Get aggregated completion statistics (lessons & exams) for a specific user.
+       Auth: Private (Owner User or Admin Only)
+       Returns: { completionPercentage, totalLessons, totalExams, ... }
+
+-----------------------------------------------------------
+7. MEETING ROUTES (/meetings)
+-----------------------------------------------------------
+[GET]  /meetings
+       Desc: Get all scheduled Google Meet sessions.
+       Auth: Private (User/Student/Admin)
+
+[POST] /meetings
+       Desc: Schedule a new Meet link.
+       Auth: Private (Admin Only)
+       Body: { title: String, meetLink: String(URL), date: DateTime(ISO8601) }
+
+===========================================================
