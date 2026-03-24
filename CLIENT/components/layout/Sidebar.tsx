@@ -14,11 +14,12 @@ import {
   BookOpen,
   MonitorPlay,
   CalendarDays,
-  CheckSquare
+  CheckSquare,
+  Layers
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 
-export function Sidebar() {
+export function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname();
   const { user } = useAuthStore();
 
@@ -26,9 +27,10 @@ export function Sidebar() {
 
   const studentLinks = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Classes", href: "/classes", icon: PlaySquare },
+    { name: "Video Classes", href: "/classes", icon: PlaySquare },
     { name: "Exams", href: "/exams", icon: FileEdit },
-    { name: "Live Sessions", href: "/live", icon: Video },
+    { name: "Live Classes", href: "/live", icon: Video },
+    { name: "Progress", href: "/progress", icon: CheckSquare },
   ];
 
   const adminLinks = [
@@ -43,39 +45,49 @@ export function Sidebar() {
   const links = isAdmin ? [...studentLinks, ...adminLinks] : studentLinks;
 
   return (
-    <div className="hidden border-r bg-muted/40 md:block md:w-64 lg:w-72 shrink-0 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto">
-      <div className="flex h-full max-h-screen flex-col gap-2">
-        <div className="flex-1 overflow-auto py-4">
-          <nav className="grid items-start px-4 text-sm font-medium space-y-1">
-            {links.map((link, index) => {
-              const Icon = link.icon;
-              const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
-              
-              // Add a subtle divider before admin links
-              const isFirstAdminLink = isAdmin && index === studentLinks.length;
-
-              return (
-                <div key={link.href}>
-                  {isFirstAdminLink && (
-                    <div className="my-4 px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Admin Panel
-                    </div>
-                  )}
-                  <Link
-                    href={link.href}
-                    className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-300 text-muted-foreground hover:text-primary hover:bg-muted hover:scale-[1.02]",
-                      isActive && "bg-primary/10 text-primary font-bold hover:bg-primary/15 shadow-sm"
-                    )}
-                  >
-                    <Icon className="h-4 w-4" />
-                    {link.name}
-                  </Link>
-                </div>
-              );
-            })}
-          </nav>
+    <div className={cn("bg-[#0d1424] flex flex-col h-screen text-gray-400 font-medium border-r border-[#1a2335] shadow-2xl", className)}>
+      {/* Brand Header */}
+      <div className="h-28 flex items-center px-8 mb-4">
+        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 via-cyan-400 to-emerald-400 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+          <Layers className="text-white w-6 h-6" fill="currentColor" strokeWidth={1} />
         </div>
+      </div>
+
+      {/* Primary Links */}
+      <div className="flex-1 overflow-y-auto px-5 pb-4 space-y-2 layout-scrollbar">
+        {links.map((link, index) => {
+          const Icon = link.icon;
+          const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+          const isFirstAdminLink = isAdmin && index === studentLinks.length;
+
+          return (
+            <div key={link.href}>
+              {isFirstAdminLink && (
+                <div className="my-6 px-3 text-[10px] font-bold text-gray-600 uppercase tracking-widest">
+                  Admin Panel
+                </div>
+              )}
+              <Link
+                href={link.href}
+                className={cn(
+                  "flex items-center gap-4 rounded-2xl px-5 py-3.5 transition-all duration-300 hover:text-white hover:bg-white/5",
+                  isActive && "bg-[#184e55] text-white shadow-xl shadow-[#184e55]/30 font-semibold"
+                )}
+              >
+                <Icon className={cn("w-[22px] h-[22px]", isActive ? "text-emerald-300" : "text-gray-500")} strokeWidth={1.5} />
+                <span className="text-[15px] tracking-wide">{link.name}</span>
+              </Link>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Settings Bottom Footer */}
+      <div className="p-5 mt-auto border-t border-[#1a2335]">
+        <Link href="/settings" className="flex items-center gap-4 rounded-2xl px-5 py-3.5 transition-all duration-300 hover:text-white hover:bg-white/5 mb-2">
+          <Settings className="w-[22px] h-[22px] text-gray-500" strokeWidth={1.5} />
+          <span className="text-[15px] tracking-wide">Settings</span>
+        </Link>
       </div>
     </div>
   );

@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import dbConnect from "@/lib/mongoose";
+import Lesson from "@/models/Lesson";
+import LessonProgress from "@/models/LessonProgress";
+import Exam from "@/models/Exam";
+import ExamResult from "@/models/ExamResult";
 import { getUserFromRequest } from "@/lib/auth";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   try {
+    await dbConnect();
     const user = getUserFromRequest(req);
     const { userId } = await params;
 
@@ -11,34 +16,19 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
       return NextResponse.json({ success: false, message: "Not authorized" }, { status: 403 });
     }
 
-    const totalLessons = await prisma.lesson.count();
-    const totalExams = await prisma.exam.count();
+    const totalLessons = await Lesson.countDocuments();
+    const completedLessons = await LessonProgress.countDocuments({ userId, completed: true });
+    const lessonProgress = totalLessons === 0 ? 0 : Math.round((completedLessons / totalLessons) * 100);
 
-    const completedLessons = await prisma.lessonProgress.count({
-      where: { userId, completed: true },
-    });
-    
-    const completedExams = await prisma.examResult.count({
-      where: { userId, completed: true },
-    });
+    const totalExams = await Exam.countDocuments();
+    const completedExams = await ExamResult.countDocuments({ userId, completed: true });
+    const examProgress = totalExams === 0 ? 0 : Math.round((completedExams / totalExams) * 100);
 
-    const totalItems = totalLessons + totalExams;
-    const completedItems = completedLessons + completedExams;
-
-    let completionPercentage = 0;
-    if (totalItems > 0) {
-      completionPercentage = (completedItems / totalItems) * 100;
-    }
+    const overallProgress = Math.round((lessonProgress + examProgress) / 2);
 
     return NextResponse.json({
       success: true,
-      data: {
-        completionPercentage: completionPercentage.toFixed(2),
-        completedLessons,
-        totalLessons,
-        completedExams,
-        totalExams,
-      },
+      data: { lessonProgress, examProgress, overallProgress },
     });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });

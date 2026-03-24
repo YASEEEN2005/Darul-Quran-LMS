@@ -64,7 +64,11 @@ function LoginSuccess() {
           approved: true, // If we got a token, backend says we are approved
         });
 
-        router.replace("/dashboard");
+        if (userRole === 'ADMIN') {
+          router.replace("/admin");
+        } else {
+          router.replace("/dashboard");
+        }
       } catch (error) {
         console.error(error);
         router.replace("/login?error=auth_failed");
