@@ -124,16 +124,27 @@ export default function ClassesPage() {
         <div className="xl:col-span-2 space-y-8">
             <motion.div 
                 layoutId="player"
-                className="aspect-video bg-[#011c18] rounded-[3rem] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border border-white/5 relative group"
+                className="aspect-video bg-[#011c18] rounded-[3rem] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] border border-white/5 relative group"
             >
                 {activeLesson ? (
-                    <div className="w-full h-full">
+                    <div className="relative w-full h-full overflow-hidden scale-[1.01]">
+                        {/* The Iframe is sized slightly larger to crop out default UI edges */}
                         <iframe 
-                            className="w-full h-full border-none shadow-2xl"
-                            src={`${activeLesson.videoUrl}?autoplay=0&rel=0&modestbranding=1&controls=1`}
+                            className="absolute inset-0 w-full h-full pointer-events-auto"
+                            src={`${activeLesson.videoUrl}?autoplay=0&rel=0&modestbranding=1&controls=1&showinfo=0&iv_load_policy=3&disablekb=1&fs=0`}
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
                         ></iframe>
+                        
+                        {/* Interactive Overlay To Block YouTube Logo/Title Click-throughs if desired */}
+                        <div className="absolute top-0 left-0 w-full h-16 bg-linear-to-b from-[#011c18]/80 to-transparent pointer-events-none z-10 flex items-center px-10">
+                            <span className="text-emerald-400/40 text-[10px] uppercase font-black tracking-widest">Secure LMS Player • {activeLesson.title}</span>
+                        </div>
+                        
+                        {/* Blocking the YouTube Logo in bottom right corner */}
+                        <div className="absolute bottom-12 right-12 w-32 h-12 bg-[#011c18] z-20 rounded-2xl flex items-center justify-center border border-white/10 text-[10px] font-black text-emerald-400 uppercase tracking-widest pointer-events-none shadow-2xl">
+                            DARUL-QURAN
+                        </div>
                     </div>
                 ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-center p-12 space-y-4">
