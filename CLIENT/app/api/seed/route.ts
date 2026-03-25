@@ -182,6 +182,18 @@ export async function GET() {
         ]
     });
 
+    // Final Certification Exam (Module 3)
+    await Exam.create({
+        courseId: osCourse._id,
+        title: "Final OS Mastery Certification",
+        orderIndex: 3,
+        questions: [
+            { text: "Which memory management technique suffers from external fragmentation?", options: ["Paging", "Segmentation", "Virtual Memory", "None"], correctOptionIndex: 1 },
+            { text: "What is the primary role of a file system?", options: ["Browsing web", "Hardware abstraction for data storage", "Compiling code", "Network routing"], correctOptionIndex: 1 },
+            { text: "What does the 'Dirty Bit' in paging signify?", options: ["Modified Page", "Deleted Page", "Read-only Page", "New Page"], correctOptionIndex: 0 }
+        ]
+    });
+
     return NextResponse.json({ 
         success: true, 
         message: "Premium Modular BCA Curriculum Seeded!",

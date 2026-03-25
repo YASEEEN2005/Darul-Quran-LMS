@@ -1,8 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Play, Pause, RotateCcw, Volume2, VolumeX, Maximize, Settings } from "lucide-react";
+import { Play, Pause, RotateCcw, Volume2, VolumeX, Maximize, Settings,
+  X,
+  Plus,
+  ArrowRight,
+  GraduationCap,
+  CheckCircle2
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/lib/toast";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface YouTubeLMSPlayerProps {
@@ -281,6 +289,46 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
         <div className="absolute top-0 left-0 w-full h-24 bg-linear-to-b from-black/60 to-transparent flex items-center px-8 opacity-0 group-hover:opacity-100 transition-opacity">
             <span className="text-white font-bold tracking-tight text-lg mb-4">{title}</span>
         </div>
+
+        {/* Video End Next Step Overlay */}
+        {hasCompleted && (
+            <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="absolute inset-0 z-50 bg-black/90 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center"
+            >
+                <motion.div
+                    initial={{ scale: 0.9, y: 10 }}
+                    animate={{ scale: 1, y: 0 }}
+                    transition={{ type: "spring", damping: 20 }}
+                    className="max-w-md w-full"
+                >
+                    <div className="w-20 h-20 rounded-3xl bg-emerald-500 flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-emerald-500/20">
+                        <CheckCircle2 size={36} className="text-white" strokeWidth={2.5} />
+                    </div>
+                    <h2 className="text-3xl font-black text-white tracking-tighter mb-2">Module Unit Completed</h2>
+                    <p className="text-emerald-100/50 font-medium mb-10 leading-relaxed">
+                        Excellent progress! Your engagement has been verified. Continue to the next phase of your curriculum.
+                    </p>
+                    
+                    <div className="flex flex-col gap-4">
+                        <Button 
+                            onClick={onComplete}
+                            className="h-16 rounded-2xl bg-white text-emerald-950 font-black text-lg hover:bg-emerald-50 transition-all flex items-center justify-center gap-3 shadow-xl"
+                        >
+                            <Play size={20} fill="currentColor" />
+                            Proceed to Next Activity
+                        </Button>
+                        <button 
+                            onClick={() => { playerRef.current?.seekTo(0); setHasCompleted(false); }}
+                            className="bg-white/5 hover:bg-white/10 text-white/40 hover:text-white px-6 py-3 rounded-xl text-sm font-bold uppercase tracking-widest transition-all"
+                        >
+                            Re-watch This Unit
+                        </button>
+                    </div>
+                </motion.div>
+            </motion.div>
+        )}
 
         {/* Triple-Arrow Skip Indicators (YouTube Style) */}
         <AnimatePresence>

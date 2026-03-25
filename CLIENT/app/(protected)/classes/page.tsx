@@ -367,6 +367,67 @@ export default function ClassesPage() {
                                     Share Milestone
                                 </Button>
                             </div>
+
+                            {/* Dynamic Progression CTA */}
+                            {(() => {
+                                const currentIndex = curriculum.findIndex(i => i.id === activeItemId);
+                                const nextItem = currentIndex !== -1 && currentIndex < curriculum.length - 1 ? curriculum[currentIndex + 1] : null;
+                                
+                                if (!nextItem) return null;
+
+                                return (
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className={cn(
+                                            "mt-10 p-8 rounded-[2rem] border transition-all duration-500 flex flex-col md:flex-row items-center justify-between gap-6",
+                                            nextItem.isLocked 
+                                                ? "bg-gray-50 border-gray-100 grayscale-[0.8]" 
+                                                : nextItem.type === 'EXAM'
+                                                    ? "bg-amber-50/50 border-amber-100 shadow-xl shadow-amber-900/5"
+                                                    : "bg-emerald-50/50 border-emerald-100 shadow-xl shadow-emerald-900/5"
+                                        )}
+                                    >
+                                        <div className="flex items-center gap-5">
+                                            <div className={cn(
+                                                "w-16 h-16 rounded-[1.25rem] flex items-center justify-center shadow-lg transition-transform hover:scale-105",
+                                                nextItem.isLocked 
+                                                    ? "bg-gray-200 text-gray-400"
+                                                    : nextItem.type === 'EXAM' 
+                                                        ? "bg-amber-500 text-white shadow-amber-500/20" 
+                                                        : "bg-emerald-600 text-white shadow-emerald-500/20"
+                                            )}>
+                                                {nextItem.isLocked ? <Lock size={24} /> : nextItem.type === 'EXAM' ? <GraduationCap size={28} /> : <PlayCircle size={28} strokeWidth={2} />}
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Next Activity</span>
+                                                    {nextItem.isLocked && <span className="text-[10px] font-black text-amber-600 bg-amber-100 px-2 py-0.5 rounded uppercase tracking-tighter">Locked</span>}
+                                                </div>
+                                                <h4 className="text-xl md:text-2xl font-black text-gray-900 tracking-tighter leading-none">{nextItem.title}</h4>
+                                                <p className="text-[11px] text-gray-500 font-bold uppercase tracking-widest mt-2">
+                                                    {nextItem.type === 'EXAM' ? "PHASE ASSESSMENT PENDING" : `VOLUMETRIC UNIT ${nextItem.orderIndex}`}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <Button 
+                                            onClick={() => selectItem(nextItem)}
+                                            disabled={nextItem.isLocked}
+                                            className={cn(
+                                                "h-14 px-10 rounded-2xl font-black transition-all shadow-xl flex gap-3 group w-full md:w-auto",
+                                                nextItem.isLocked 
+                                                    ? "bg-gray-100 text-gray-400 border-gray-200"
+                                                    : nextItem.type === 'EXAM'
+                                                        ? "bg-amber-500 hover:bg-amber-600 text-white hover:scale-105 active:scale-95"
+                                                        : "bg-emerald-600 hover:bg-emerald-500 text-white hover:scale-105 active:scale-95"
+                                            )}
+                                        >
+                                            {nextItem.type === 'EXAM' ? "Start Assessment" : "Move to Next Unit"}
+                                            <ChevronRight className="transition-transform group-hover:translate-x-1" size={20} />
+                                        </Button>
+                                    </motion.div>
+                                );
+                            })()}
                         </div>
 
                         <div className="w-full lg:w-72">
