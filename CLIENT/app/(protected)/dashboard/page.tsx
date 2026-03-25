@@ -103,6 +103,24 @@ export default function DashboardPage() {
             <p className="text-emerald-100/40 text-sm md:text-lg font-medium leading-relaxed mb-8 max-w-lg">
                 Your academic journey through Operating Systems is being recorded with secure verification.
             </p>
+            
+            <div className="flex flex-wrap gap-4 mb-10">
+                <div className="bg-emerald-500/10 border border-emerald-500/20 px-6 py-3 rounded-2xl backdrop-blur-md">
+                    <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-emerald-400/60 mb-1">Prestige Points</span>
+                    <div className="flex items-center gap-2">
+                        <Sparkles size={16} className="text-emerald-400" />
+                        <span className="text-2xl font-black text-white px-1 tracking-tight">{stats?.points || 0}</span>
+                    </div>
+                </div>
+                <div className="bg-emerald-500/10 border border-emerald-500/20 px-6 py-3 rounded-2xl backdrop-blur-md">
+                    <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-emerald-400/60 mb-1">Merit Badges</span>
+                    <div className="flex items-center gap-2">
+                        <Trophy size={16} className="text-emerald-400" />
+                        <span className="text-2xl font-black text-white px-1 tracking-tight">{stats?.achievements?.length || 0}</span>
+                    </div>
+                </div>
+            </div>
+
             <Link href="/classes">
                 <Button className="h-12 md:h-16 px-8 md:px-10 rounded-[1.25rem] md:rounded-[1.5rem] bg-emerald-500 hover:bg-emerald-400 text-white font-black text-sm md:text-lg shadow-[0_20px_40px_rgba(16,185,129,0.2)] transition-all">
                     Enter Classroom
@@ -257,6 +275,36 @@ export default function DashboardPage() {
             </div>
 
             {/* Achievement / Goal Mini Widget */}
+            <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm relative overflow-hidden group">
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h3 className="text-xl font-black text-gray-900 tracking-tight leading-none mb-1">Merit Badges</h3>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Achievements Earned</p>
+                    </div>
+                    <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600 transition-transform group-hover:rotate-12">
+                        <Trophy size={22} />
+                    </div>
+                </div>
+                <div className="space-y-4">
+                    {stats?.achievements && stats.achievements.length > 0 ? (
+                        stats.achievements.map((ach: any, idx: number) => (
+                            <div key={idx} className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100 flex items-center gap-4 group/item hover:bg-emerald-50 transition-all">
+                                <div className="text-2xl">{ach.icon}</div>
+                                <div>
+                                    <h4 className="text-sm font-black text-emerald-900">{ach.title}</h4>
+                                    <p className="text-[10px] text-emerald-600/60 font-medium">{ach.description}</p>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-6">
+                            <p className="text-xs font-bold text-gray-300 uppercase tracking-widest">No badges earned yet</p>
+                            <p className="text-[10px] text-gray-400 mt-1">Complete lessons to unlock your first badge!</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
             <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm relative overflow-hidden group">
                 <div className="flex items-center justify-between mb-8">
                     <div>

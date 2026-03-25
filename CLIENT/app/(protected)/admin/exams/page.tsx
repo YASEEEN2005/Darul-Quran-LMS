@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/lib/toast";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { PlusCircle, Trash2, Search, Users, Trophy as TrophyIcon, User as UserIcon, Mail, CheckCircle2 } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 export default function AdminExamsPage() {
   const [courses, setCourses] = useState<any[]>([]);
@@ -17,11 +19,25 @@ export default function AdminExamsPage() {
   const [questions, setQuestions] = useState([{ text: "", options: ["", ""], correctOptionIndex: 0 }]);
   const { toast } = useToast();
 
+  const [view, setView] = useState<"create" | "results">("create");
+  const [students, setStudents] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoadingResults, setIsLoadingResults] = useState(false);
+
   useEffect(() => {
     api.get("/courses").then(res => {
       if (res.success) setCourses(res.data);
     });
   }, []);
+
+  useEffect(() => {
+    if (view === "results") {
+      setIsLoadingResults(true);
+      api.get("/admin/student-stats").then(res => {
+        if (res.success) setStudents(res.data);
+      }).finally(() => setIsLoadingResults(false));
+    }
+  }, [view]);
 
   const handleCreateExam = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,12 +67,35 @@ export default function AdminExamsPage() {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Create Examination</h1>
-        <p className="text-muted-foreground">Add interactive quizzes required for course progression.</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Examination Management</h1>
+          <p className="text-muted-foreground">Configure curriculum assessments or monitor student performance.</p>
+        </div>
+        <div className="flex bg-gray-100 p-1 rounded-xl border border-gray-200">
+           <button 
+              onClick={() => setView("create")}
+              className={cn(
+                "px-4 py-2 rounded-lg text-sm font-bold transition-all",
+                view === "create" ? "bg-white text-emerald-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              )}
+           >
+              Create Exam
+           </button>
+           <button 
+              onClick={() => setView("results")}
+              className={cn(
+                "px-4 py-2 rounded-lg text-sm font-bold transition-all",
+                view === "results" ? "bg-white text-emerald-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              )}
+           >
+              Student Results
+           </button>
+        </div>
       </div>
 
-      <form onSubmit={handleCreateExam} className="space-y-6">
+      {view === "create" ? (
+      <form onSubmit={handleCreateExam} className="space-y-6 animate-in fade-in slide-in-from-left-4 duration-500">
         <Card>
           <CardHeader>
             <CardTitle>Exam Configuration</CardTitle>
@@ -164,6 +203,135 @@ export default function AdminExamsPage() {
            <Button type="submit">Save Exam</Button>
         </div>
       </form>
+      ) : (
+        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+           <Card>
+             <CardHeader className="pb-4">
+               <div className="flex items-center justify-between">
+                 <div>
+                   <CardTitle>Academic Results Ledger</CardTitle>
+                   <CardDescription>Comprehensive log of all student assessment attempts and performance metrics.</CardDescription>
+                 </div>
+                 <div className="relative w-64">
+                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                   <Input 
+                      placeholder="Search student..." 
+                      className="pl-9 h-10 border-gray-200"
+                      value={searchQuery}
+                      onChange={e => setSearchQuery(e.target.value)}
+                   />
+                 </div>
+               </div>
+             </CardHeader>
+             <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent border-gray-100">
+                      <TableHead className="font-bold text-gray-900">Student</TableHead>
+                      <TableHead className="font-bold text-gray-900">Course / Exam</TableHead>
+                      <TableHead className="font-bold text-gray-900 text-center">Score</TableHead>
+                      <TableHead className="font-bold text-gray-900 text-right">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {isLoadingResults ? (
+                      [1,2,3].map(i => (
+                        <TableRow key={i}>
+                          <TableCell><div className="h-10 bg-gray-50 animate-pulse rounded-lg" /></TableCell>
+                          <TableCell><div className="h-10 bg-gray-50 animate-pulse rounded-lg" /></TableCell>
+                          <TableCell><div className="h-10 bg-gray-50 animate-pulse rounded-lg" /></TableCell>
+                          <TableCell><div className="h-10 bg-gray-50 animate-pulse rounded-lg" /></TableCell>
+                        </TableRow>
+                      ))
+                    ) : students.length === 0 ? (
+                       <TableRow>
+                          <TableCell colSpan={4} className="text-center py-12 text-gray-400">No student records found.</TableCell>
+                       </TableRow>
+                    ) : (
+                      students
+                        .filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()) || s.email.toLowerCase().includes(searchQuery.toLowerCase()))
+                        .map(student => (
+                          <React.Fragment key={student.id}>
+                            {student.courses.map((course: any) => 
+                              course.examScores.map((exam: any, eIdx: number) => (
+                                <TableRow key={`${student.id}-${course.courseId}-${eIdx}`} className="border-gray-50 hover:bg-emerald-50/30 transition-colors">
+                                  <TableCell>
+                                    <div className="flex items-center gap-3">
+                                       <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-xs font-black text-gray-600 border border-gray-200 shadow-sm">
+                                          {student.name.substring(0,2).toUpperCase()}
+                                       </div>
+                                       <div>
+                                          <div className="font-bold text-gray-900">{student.name}</div>
+                                          <div className="text-[10px] font-medium text-gray-400 italic">{student.email}</div>
+                                       </div>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>
+                                     <div className="font-bold text-emerald-900">{exam.title}</div>
+                                     <div className="text-[10px] font-medium text-gray-400 uppercase tracking-widest">{course.title}</div>
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                     <div className="inline-flex flex-col items-center">
+                                        <span className={cn(
+                                          "text-lg font-black tracking-tighter",
+                                          exam.score >= 80 ? "text-emerald-600" : exam.score >= 50 ? "text-blue-600" : "text-amber-600"
+                                        )}>{exam.score}%</span>
+                                        <div className="w-12 h-1 bg-gray-100 rounded-full mt-1 overflow-hidden">
+                                           <div className={cn(
+                                              "h-full rounded-full transition-all duration-1000",
+                                              exam.score >= 80 ? "bg-emerald-500" : exam.score >= 50 ? "bg-blue-500" : "bg-amber-500"
+                                           )} style={{ width: `${exam.score}%` }}></div>
+                                        </div>
+                                     </div>
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-tighter border border-emerald-100">
+                                        <CheckCircle2 size={12} />
+                                        Completed
+                                     </span>
+                                  </TableCell>
+                                </TableRow>
+                              ))
+                            )}
+                          </React.Fragment>
+                        ))
+                    )}
+                  </TableBody>
+                </Table>
+             </CardContent>
+           </Card>
+
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-[#011c18] p-6 rounded-[2rem] text-white shadow-xl relative overflow-hidden group">
+                 <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-700"></div>
+                 <Users className="w-8 h-8 text-emerald-400 mb-4" />
+                 <div className="text-4xl font-black tracking-tighter mb-1">
+                    {new Set(students.flatMap(s => s.courses.flatMap((c: any) => c.examScores.length > 0 ? [s.id] : []))).size}
+                 </div>
+                 <div className="text-[10px] font-black uppercase tracking-widest text-emerald-400/60">Students Evaluated</div>
+              </div>
+              
+              <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-xl relative overflow-hidden group">
+                 <TrophyIcon className="w-8 h-8 text-emerald-600 mb-4" />
+                 <div className="text-4xl font-black tracking-tighter mb-1">
+                    {Math.round(students.reduce((acc, s) => {
+                      const scores = s.courses.flatMap((c: any) => c.examScores.map((e: any) => e.score));
+                      return acc + (scores.length > 0 ? scores.reduce((a: number, b: number) => a + b, 0) / scores.length : 0);
+                    }, 0) / (students.filter(s => s.courses.some((c: any) => c.examScores.length > 0)).length || 1))}%
+                 </div>
+                 <div className="text-[10px] font-black uppercase tracking-widest text-emerald-600/60">Mean Pass Rate</div>
+              </div>
+
+              <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-xl relative overflow-hidden group">
+                 <Mail className="w-8 h-8 text-emerald-600 mb-4" />
+                 <div className="text-4xl font-black tracking-tighter mb-1">
+                    {students.reduce((acc, s) => acc + s.courses.reduce((a: number, c: any) => a + c.examScores.length, 0), 0)}
+                 </div>
+                 <div className="text-[10px] font-black uppercase tracking-widest text-emerald-600/60">Total Assessments</div>
+              </div>
+           </div>
+        </div>
+      )}
     </div>
   );
 }

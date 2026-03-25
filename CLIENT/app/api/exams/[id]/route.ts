@@ -36,10 +36,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         userProgress.some((p: any) => p.lessonId.toString() === l._id.toString() && p.completed)
       );
 
+      const userResult = examResults.find((r: any) => r.examId.toString() === exam._id.toString());
+
       return { 
         ...exam, 
         id: exam._id.toString(),
-        isLocked: !precedingExamsPassed || !moduleLessonsCompleted,
+        isLocked: !userResult && (!precedingExamsPassed || !moduleLessonsCompleted),
+        result: userResult || null,
         questions: exam.questions.map((q: any) => ({ ...q, id: q._id.toString() }))
       };
     });

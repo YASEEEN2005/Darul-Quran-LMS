@@ -14,7 +14,9 @@ import {
   AlertCircle,
   ShieldAlert,
   GraduationCap,
-  ArrowRight
+  ArrowRight,
+  Trophy,
+  Sparkles
 } from "lucide-react";
 import { useProgressStore } from "@/store/progressStore";
 import { useToast } from "@/lib/toast";
@@ -86,6 +88,96 @@ export default function ExamsPage() {
   };
 
   if (activeExam) {
+    const isCompleted = activeExam.result?.completed;
+    const score = activeExam.result?.score;
+
+    if (isCompleted) {
+      return (
+        <div className="max-w-4xl mx-auto space-y-10 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-[#011c18] rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden text-center"
+          >
+            <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-10"></div>
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl"></div>
+            <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
+            
+            <div className="relative z-10 space-y-8">
+              <div className="inline-flex bg-emerald-500/20 border border-emerald-500/30 px-6 py-2 rounded-full items-center gap-2 mb-4">
+                 <CheckCircle2 size={18} className="text-emerald-400" />
+                 <span className="text-[12px] font-black uppercase tracking-widest text-emerald-100">Assessment Validated</span>
+              </div>
+              
+              <div>
+                <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-4 leading-none">
+                  {activeExam.title}
+                </h1>
+                <p className="text-emerald-100/60 text-lg font-medium max-w-xl mx-auto italic">
+                  "Knowledge is the light of the heart; you have successfully illuminated your path through this module."
+                </p>
+              </div>
+
+              <div className="flex flex-col md:flex-row justify-center items-center gap-8 py-8">
+                <div className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] backdrop-blur-xl w-full md:w-64 transform hover:scale-105 transition-transform duration-500 underline-offset-8">
+                   <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400/60 mb-2">Achieved Mastery</span>
+                   <span className="text-6xl font-black tracking-tighter">{Math.round(score)}%</span>
+                </div>
+
+                <div className="bg-emerald-500/10 border border-emerald-500/20 p-10 rounded-[2.5rem] backdrop-blur-xl w-full md:w-64 transform hover:scale-105 transition-transform duration-500">
+                   <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-emerald-400/60 mb-2">Prestige Earned</span>
+                   <div className="flex items-center justify-center gap-2">
+                      <Sparkles size={24} className="text-emerald-400" />
+                      <span className="text-5xl font-black tracking-tighter">+{activeExam.questions.length * 10}</span>
+                   </div>
+                </div>
+                
+                <div className="space-y-4 text-left">
+                   <div className="flex items-center gap-4 group">
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 border border-emerald-500/30">
+                         <Trophy size={20} />
+                      </div>
+                      <div>
+                         <h4 className="font-black text-sm uppercase tracking-wider">Honor Status</h4>
+                         <p className="text-emerald-100/50 text-xs font-bold uppercase">{score >= 80 ? 'Gold Distinction' : score >= 50 ? 'Silver Proficiency' : 'Standard Completion'}</p>
+                      </div>
+                   </div>
+                   <div className="flex items-center gap-4 group">
+                      <div className="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-400 border border-blue-500/30">
+                         <Timer size={20} />
+                      </div>
+                      <div>
+                         <h4 className="font-black text-sm uppercase tracking-wider">Attempt Cycle</h4>
+                         <p className="text-emerald-100/50 text-xs font-bold uppercase">Final Record Locked</p>
+                      </div>
+                   </div>
+                </div>
+              </div>
+
+              <div className="pt-8 flex justify-center gap-4">
+                 <Button 
+                    onClick={() => setActiveExam(null)}
+                    className="h-16 px-12 rounded-2xl bg-white text-[#011c18] hover:bg-emerald-50 font-black text-lg shadow-2xl transition-all"
+                 >
+                    Return to Dashboard
+                 </Button>
+              </div>
+            </div>
+          </motion.div>
+
+          <Card className="bg-white/50 backdrop-blur-sm rounded-[2.5rem] border border-gray-100 p-8 text-center max-w-2xl mx-auto">
+             <div className="flex items-center justify-center gap-3 text-emerald-600 mb-2">
+                <ShieldAlert size={20} />
+                <span className="font-black uppercase tracking-[0.2em] text-xs">Administrative Notice</span>
+             </div>
+             <p className="text-gray-500 font-medium text-sm">
+                This assessment follows a strict single-attempt policy. Your results have been permanently logged in the curriculum registry. You may review your score, but the test content remains confidential to preserve evaluation integrity.
+             </p>
+          </Card>
+        </div>
+      );
+    }
+
     return (
       <div className="max-w-4xl mx-auto space-y-10 pb-20">
         <motion.div 
@@ -219,17 +311,19 @@ export default function ExamsPage() {
           <AnimatePresence>
             {exams.map((exam, idx) => {
               const isLocked = exam.isLocked;
+              const isCompleted = exam.result?.completed;
+              const score = exam.result?.score;
               return (
               <motion.div 
                 key={exam.id}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.1 }}
-                whileHover={!isLocked ? { y: -8 } : {}}
+                whileHover={!isLocked && !isCompleted ? { y: -8 } : {}}
               >
                 <Card className={cn(
                     "flex flex-col h-full bg-white rounded-[2.5rem] border transition-all duration-700 overflow-hidden relative group",
-                    isLocked ? "border-gray-100 opacity-60 grayscale cursor-not-allowed" : "border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-900/10"
+                    isLocked ? "border-gray-100 opacity-60 grayscale cursor-not-allowed" : isCompleted ? "border-emerald-200/50 shadow-sm" : "border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-900/10"
                 )}>
                   {isLocked && (
                     <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/5 backdrop-blur-[1px]">
@@ -238,44 +332,55 @@ export default function ExamsPage() {
                         </div>
                     </div>
                   )}
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 group-hover:bg-emerald-500/10 transition-all duration-700"></div>
-                  <CardHeader className="p-8 pb-4">
+                  {!isLocked && !isCompleted && <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 group-hover:bg-emerald-500/10 transition-all duration-700"></div>}
+                  {isCompleted && <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-16 -mt-16"></div>}
+                  
+                  <CardHeader className="p-8 pb-4 relative z-10">
                     <div className={cn(
                         "w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform shadow-inner border",
-                        isLocked ? "bg-gray-100 border-gray-200" : "bg-emerald-50 border-emerald-100/50 group-hover:scale-110"
+                        isLocked ? "bg-gray-100 border-gray-200" : isCompleted ? "bg-emerald-500 border-emerald-600 text-white" : "bg-emerald-50 border-emerald-100/50 group-hover:scale-110"
                     )}>
-                      {isLocked ? <Lock className="h-6 w-6 text-gray-300" /> : <FileEdit className="h-6 w-6 text-emerald-600" strokeWidth={2.5} />}
+                      {isLocked ? <Lock className="h-6 w-6 text-gray-300" /> : isCompleted ? <CheckCircle2 className="h-6 w-6 text-white" /> : <FileEdit className="h-6 w-6 text-emerald-600" strokeWidth={2.5} />}
                     </div>
                     <CardTitle className="text-2xl font-black text-gray-900 tracking-tight leading-tight mb-2">{exam.title}</CardTitle>
                     <div className="flex items-center gap-2">
-                         <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600/50">Module {exam.orderIndex}</span>
+                         <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600/50">Module {exam.orderIndex || idx + 1}</span>
                          <div className="w-1 h-1 rounded-full bg-gray-200"></div>
-                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{isLocked ? 'Locked' : 'Available'} Assessment</span>
+                         <span className={cn("text-[10px] font-bold uppercase tracking-widest", isCompleted ? "text-emerald-500" : "text-gray-400")}>{isLocked ? 'Locked' : isCompleted ? 'Completed' : 'Available'} Assessment</span>
                     </div>
                   </CardHeader>
-                  <CardContent className="p-8 pt-0 flex-1">
-                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                         <div className="flex justify-between items-center text-[11px] font-black uppercase text-gray-400 tracking-widest mb-1">
-                             <span>Complexity</span>
-                             <span className="text-emerald-600">Advanced</span>
-                         </div>
-                         <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-                             <div className="h-full w-[80%] bg-emerald-500 rounded-full"></div>
-                         </div>
-                    </div>
+                  <CardContent className="p-8 pt-0 flex-1 relative z-10">
+                    {isCompleted ? (
+                      <div className="p-5 bg-emerald-50 rounded-2xl border border-emerald-100/50 text-center">
+                          <div className="text-[10px] font-black uppercase text-emerald-600/60 tracking-widest mb-1">Final Score</div>
+                          <div className="text-3xl font-black text-emerald-700">{Math.round(score)}%</div>
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                           <div className="flex justify-between items-center text-[11px] font-black uppercase text-gray-400 tracking-widest mb-1">
+                               <span>Complexity</span>
+                               <span className="text-emerald-600">Standard</span>
+                           </div>
+                           <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                               <div className="h-full w-[100%] bg-emerald-500 rounded-full"></div>
+                           </div>
+                      </div>
+                    )}
                   </CardContent>
-                  <CardFooter className="p-8 pt-0">
+                  <CardFooter className="p-8 pt-0 relative z-10">
                     <Button 
                         disabled={isLocked}
                         className={cn(
                             "w-full h-14 rounded-2xl font-black shadow-lg transition-all flex gap-3",
-                            isLocked 
-                                ? "bg-gray-100 text-gray-400 border-gray-200" 
-                                : "bg-emerald-600 hover:bg-[#011c18] text-white shadow-emerald-500/10 group-hover:shadow-emerald-500/20"
+                            isLocked
+                                ? "bg-gray-100 text-gray-400 border-gray-200 shadow-none" 
+                                : isCompleted 
+                                  ? "bg-white text-emerald-600 border border-emerald-100 hover:bg-emerald-50"
+                                  : "bg-emerald-600 hover:bg-[#011c18] text-white shadow-emerald-500/10 group-hover:shadow-emerald-500/20"
                         )}
                         onClick={() => setActiveExam(exam)}
                     >
-                        {isLocked ? 'Access Restricted' : 'Initiate Assessment'}
+                        {isLocked ? 'Access Restricted' : isCompleted ? 'View Assessment Result' : 'Initiate Assessment'}
                         {!isLocked && <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />}
                     </Button>
                   </CardFooter>

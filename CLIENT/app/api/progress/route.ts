@@ -5,6 +5,7 @@ import ExamResult from "@/models/ExamResult";
 import Lesson from "@/models/Lesson";
 import Exam from "@/models/Exam";
 import Course from "@/models/Course";
+import User from "@/models/User";
 import { getUserFromRequest } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
@@ -18,12 +19,13 @@ export async function GET(req: NextRequest) {
 
     const courseId = courses[0]._id; // For now, we assume the first course (OS)
     
-    const [lessons, exams, progresses, results, meetings] = await Promise.all([
+    const [lessons, exams, progresses, results, meetings, userData] = await Promise.all([
       Lesson.find({ courseId }).lean(),
       Exam.find({ courseId }).lean(),
       UserProgress.find({ userId: user.id }).lean(),
       ExamResult.find({ userId: user.id }).lean(),
-      (await import("@/models/Meeting")).default.find().lean()
+      (await import("@/models/Meeting")).default.find().lean(),
+      User.findById(user.id).select("points achievements").lean()
     ]);
 
     const completedLessonIds = progresses.filter((p: any) => p.completed).map((p: any) => p.lessonId.toString());
@@ -50,7 +52,9 @@ export async function GET(req: NextRequest) {
         averageScore: results.length > 0 ? Math.round(results.reduce((acc: number, r: any) => acc + r.score, 0) / results.length) : 0,
         overallCompletion: completion,
         attendance: attendancePercent,
-        rank: academicRank
+        rank: academicRank,
+        points: (userData as any)?.points || 0,
+        achievements: (userData as any)?.achievements || []
     };
 
     return NextResponse.json({ success: true, data: stats });

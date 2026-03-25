@@ -3,6 +3,7 @@ import dbConnect from "@/lib/mongoose";
 import Exam from "@/models/Exam";
 import ExamResult from "@/models/ExamResult";
 import { getUserFromRequest } from "@/lib/auth";
+import { addPoints, checkExamAchievements } from "@/lib/achievements";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -28,14 +29,29 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       }
     });
 
+    const existingResult = await ExamResult.findOne({ userId, examId });
+    if (existingResult) {
+      return NextResponse.json({ success: false, message: "You have already completed this exam." }, { status: 400 });
+    }
+
     const score = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
     const completed = true; 
 
-    const result = await ExamResult.findOneAndUpdate(
-      { userId, examId },
-      { score, completed },
-      { upsert: true, new: true }
-    );
+    const result = await ExamResult.create({
+      userId,
+      examId,
+      score,
+      completed
+    });
+
+    // --- Gamification ---
+    // 1. Add points (10 per correct answer)
+    await addPoints(userId.toString(), correctCount * 10);
+
+    // 2. Check for achievements
+    const totalExamsPassed = await ExamResult.countDocuments({ userId, completed: true });
+    await checkExamAchievements(userId.toString(), score, totalExamsPassed);
+    // --------------------
 
     return NextResponse.json({
       success: true,
