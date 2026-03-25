@@ -23,7 +23,6 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
   const playerRef = useRef<any>(null);
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [maxTimeViewed, setMaxTimeViewed] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
@@ -86,6 +85,9 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
     });
   };
 
+  const [totalWatchedTime, setTotalWatchedTime] = useState(0);
+  const [hasCompleted, setHasCompleted] = useState(false);
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (playerRef.current && isPlaying) {
@@ -93,17 +95,24 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
         setCurrentTime(time);
         if (onProgress) onProgress(time, duration);
 
-        // Prevent skipping ahead
-        if (time > maxTimeViewed + 2) {
-          playerRef.current.seekTo(maxTimeViewed, true);
-        } else if (time > maxTimeViewed) {
-          setMaxTimeViewed(time);
-        }
+        // Instead of blocking seeks, we track actual engagement
+        // We only increment totalWatchedTime if the player is active
+        // and not seeking (detected by a 1s interval check)
+        setTotalWatchedTime(prev => {
+            const next = prev + 0.5; // Interval is 500ms
+            
+            // Check if 80% threshold reached
+            if (duration > 0 && next >= duration * 0.8 && !hasCompleted) {
+                setHasCompleted(true);
+                onComplete();
+            }
+            return next;
+        });
       }
     }, 500);
 
     return () => clearInterval(interval);
-  }, [isPlaying, maxTimeViewed]);
+  }, [isPlaying, duration, hasCompleted]);
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -115,10 +124,8 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
-    if (val <= maxTimeViewed) {
-      playerRef.current.seekTo(val, true);
-      setCurrentTime(val);
-    }
+    playerRef.current.seekTo(val, true);
+    setCurrentTime(val);
   };
 
   const [isMuted, setIsMuted] = useState(false);
@@ -171,25 +178,44 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
       ref={containerRef}
       className="relative w-full aspect-video bg-black overflow-hidden group"
     >
-      <div id={`youtube-player-${videoId}`} className="absolute inset-0 w-full h-full pointer-events-none scale-[1.3]"></div>
+      <div id={`youtube-player-${videoId}`} className="absolute inset-0 w-full h-full pointer-events-none scale-[1.35] translate-y-[-2%]"></div>
       
+      {/* Premium Cover Overlay to hide YouTube branding */}
+      {!isPlaying && (
+        <div 
+            className="absolute inset-0 z-20 bg-cover bg-center transition-all duration-700"
+            style={{ backgroundImage: `url(https://img.youtube.com/vi/${videoId}/maxresdefault.jpg)` }}
+        >
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
+                <div 
+                    onClick={togglePlay}
+                    className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.5)] hover:scale-110 transition-transform cursor-pointer group/play"
+                >
+                    <Play className="text-white fill-current translate-x-1 group-hover/play:scale-110 transition-transform" size={40} />
+                </div>
+            </div>
+            
+            <div className="absolute top-8 left-8 flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center">
+                    <Settings className="text-white/60 animate-spin-slow" size={20} />
+                </div>
+                <div className="space-y-1">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">Secure Session</span>
+                    <h4 className="text-white font-bold leading-none">{title}</h4>
+                </div>
+            </div>
+        </div>
+      )}
+
       <div className="absolute inset-0 z-10 cursor-pointer" onClick={togglePlay}>
         <div className="absolute top-0 left-0 w-full h-24 bg-linear-to-b from-black/60 to-transparent flex items-center px-8 opacity-0 group-hover:opacity-100 transition-opacity">
             <span className="text-white font-bold tracking-tight text-lg mb-4">{title}</span>
         </div>
 
-        {!isPlaying && isReady && (
-            <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center shadow-2xl shadow-emerald-500/40 animate-pulse">
-                    <Play className="text-white fill-current translate-x-1" size={32} />
-                </div>
-            </div>
-        )}
-
         <div className="absolute bottom-0 left-0 w-full p-6 bg-linear-to-t from-black/80 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20" onClick={(e) => e.stopPropagation()}>
           <div className="relative w-full h-1.5 bg-white/20 rounded-full mb-4 overflow-hidden group/bar">
              <div className="absolute top-0 left-0 h-full bg-emerald-500 rounded-full z-10 transition-all duration-300" style={{ width: `${(currentTime / duration) * 100}%` }}></div>
-             <div className="absolute top-0 left-0 h-full bg-white/30 rounded-full transition-all duration-300" style={{ width: `${(maxTimeViewed / duration) * 100}%` }}></div>
+             <div className="absolute top-0 left-0 h-full bg-white/10 rounded-full transition-all duration-300" style={{ width: `${(totalWatchedTime / (duration * 0.8)) * 100}%` }}></div>
              <input type="range" min="0" max={duration} step="0.1" value={currentTime} onChange={handleSeek} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
           </div>
 
@@ -217,6 +243,14 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
             </div>
             
             <div className="flex items-center gap-4">
+                 {/* Watch progress pill */}
+                 <div className="hidden sm:flex items-center gap-2 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                     <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                     <span className="text-[9px] font-black tracking-widest uppercase text-emerald-500">
+                        {Math.min(100, Math.floor((totalWatchedTime / (duration * 0.8)) * 100))}% Engagement
+                     </span>
+                 </div>
+                 
                  <button onClick={toggleFullscreen} className="hover:text-emerald-400 transition-colors mr-2">
                     <Maximize size={20} />
                  </button>
@@ -228,10 +262,24 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
       </div>
 
 
-      {/* Skipping Denied Toast inside player */}
-      {currentTime < maxTimeViewed - 5 && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded-full text-xs font-bold border border-white/10 z-30 animate-in fade-in zoom-in">
-              Skipping ahead is restricted. Complete the lesson to advance.
+      {/* Engagement Status Overlay */}
+      {duration > 0 && totalWatchedTime < duration * 0.8 && isPlaying && (
+          <div className="absolute top-6 right-6 z-30 pointer-events-none">
+              <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10 flex items-center gap-3 animate-in slide-in-from-right">
+                  <div className="relative w-8 h-8">
+                      <svg className="w-full h-full translate-[-50%,-50%] -rotate-90">
+                          <circle className="text-white/10" strokeWidth="3" stroke="currentColor" fill="transparent" r="14" cx="16" cy="16" />
+                          <circle 
+                            className="text-emerald-500" strokeWidth="3" strokeDasharray={88} strokeDashoffset={88 - (88 * totalWatchedTime) / (duration * 0.8)} 
+                            strokeLinecap="round" stroke="currentColor" fill="transparent" r="14" cx="16" cy="16" 
+                          />
+                      </svg>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black text-white/40 uppercase leading-none">Focus Required</span>
+                    <span className="text-xs font-bold text-white uppercase tracking-tight">{Math.floor((duration * 0.8 - totalWatchedTime))}s left to unlock</span>
+                  </div>
+              </div>
           </div>
       )}
     </div>

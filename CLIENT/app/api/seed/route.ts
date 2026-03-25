@@ -38,13 +38,13 @@ export async function GET() {
     });
 
     const playlist = [
-        { title: "Introduction To Programming", id: "pDmEYRhyusU" },
-        { title: "Linux Installation | Eclipse IDE", id: "XW7HI6ajZfo" },
-        { title: "Variables Datatypes & I/O", id: "qGGqnzvKjmM" },
-        { title: "Conditional Statements", id: "W7s0upNfcKY" },
-        { title: "Loops: FOR Loop explained", id: "YfaJzXFbFcQ" },
-        { title: "Arrays & Data Structures", id: "d0drJeqmiws" },
-        { title: "Functions & Scope", id: "pDmEYRhyusU" }, // Placeholder duplicate for test
+        { title: "Introduction To Programming", id: "mPCzY7b_-YY" },
+        { title: "Linux Installation | Eclipse IDE", id: "mPCzY7b_-YY" },
+        { title: "Variables Datatypes & I/O", id: "mPCzY7b_-YY" },
+        { title: "Conditional Statements", id: "mPCzY7b_-YY" },
+        { title: "Loops: FOR Loop explained", id: "mPCzY7b_-YY" },
+        { title: "Arrays & Data Structures", id: "mPCzY7b_-YY" },
+        { title: "Functions & Scope", id: "mPCzY7b_-YY" },
     ];
 
     for (let i = 0; i < playlist.length; i++) {
@@ -63,9 +63,9 @@ export async function GET() {
     });
 
     const quranLessons = [
-        { title: "Basics of Makharij", id: "97_y1tX-fsw" },
-        { title: "Rules of Noon Sakinah", id: "97_y1tX-fsw" },
-        { title: "Meem Sakinah & Madd", id: "97_y1tX-fsw" },
+        { title: "Basics of Makharij", id: "hHldb-vfnQk" },
+        { title: "Rules of Noon Sakinah", id: "hHldb-vfnQk" },
+        { title: "Meem Sakinah & Madd", id: "hHldb-vfnQk" },
     ];
 
     for (let i = 0; i < quranLessons.length; i++) {
@@ -84,9 +84,9 @@ export async function GET() {
     });
 
     const fiqhLessons = [
-        { title: "Understanding Fiqh & Its Sources", id: "pDmEYRhyusU" },
-        { title: "Rules of Taharah (Purification)", id: "pDmEYRhyusU" },
-        { title: "The Pillar of Salah", id: "pDmEYRhyusU" },
+        { title: "Understanding Fiqh & Its Sources", id: "hV9vPj_9Z6g" },
+        { title: "Rules of Taharah (Purification)", id: "hV9vPj_9Z6g" },
+        { title: "The Pillar of Salah", id: "hV9vPj_9Z6g" },
     ];
 
     for (let i = 0; i < fiqhLessons.length; i++) {
@@ -105,9 +105,9 @@ export async function GET() {
     });
 
     const seerahLessons = [
-        { title: "The Pre-Islamic World", id: "XW7HI6ajZfo" },
-        { title: "Early Life in Makkah", id: "XW7HI6ajZfo" },
-        { title: "The Revelation & Da'wah", id: "XW7HI6ajZfo" },
+        { title: "The Pre-Islamic World", id: "VO3f_f45yO8" },
+        { title: "Early Life in Makkah", id: "VO3f_f45yO8" },
+        { title: "The Revelation & Da'wah", id: "VO3f_f45yO8" },
     ];
 
     for (let i = 0; i < seerahLessons.length; i++) {
