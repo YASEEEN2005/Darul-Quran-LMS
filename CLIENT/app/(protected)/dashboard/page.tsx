@@ -156,8 +156,8 @@ export default function DashboardPage() {
       >
         <StatItem label="Gated Modules" value={courses.length} icon={BookOpen} trend={`${stats?.completedExams || 0} Passed`} theme="emerald" />
         <StatItem label="Verification Avg" value={`${stats?.averageScore || 0}%`} icon={Target} trend="High Fidelity" theme="emerald" />
-        <StatItem label="Academic Rank" value={stats?.overallCompletion >= 70 ? "Alpha" : "Beta"} icon={Trophy} trend="Course Standing" theme="emerald" />
-        <StatItem label="Live Attendance" value="100%" icon={Users} trend="Perfect Sync" theme="emerald" />
+        <StatItem label="Academic Rank" value={stats?.rank || "Gamma"} icon={Trophy} trend="Course Standing" theme="emerald" />
+        <StatItem label="Live Attendance" value={`${stats?.attendance || 0}%`} icon={Users} trend="Perfect Sync" theme="emerald" />
       </motion.div>
 
       {/* Main Content Layout */}

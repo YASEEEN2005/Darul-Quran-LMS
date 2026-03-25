@@ -18,11 +18,12 @@ export async function GET(req: NextRequest) {
 
     const courseId = courses[0]._id; // For now, we assume the first course (OS)
     
-    const [lessons, exams, progresses, results] = await Promise.all([
+    const [lessons, exams, progresses, results, meetings] = await Promise.all([
       Lesson.find({ courseId }).lean(),
       Exam.find({ courseId }).lean(),
       UserProgress.find({ userId: user.id }).lean(),
-      ExamResult.find({ userId: user.id }).lean()
+      ExamResult.find({ userId: user.id }).lean(),
+      (await import("@/models/Meeting")).default.find().lean()
     ]);
 
     const completedLessonIds = progresses.filter((p: any) => p.completed).map((p: any) => p.lessonId.toString());
@@ -31,13 +32,25 @@ export async function GET(req: NextRequest) {
         return acc;
     }, {});
 
+    const attendedMeetings = meetings.filter((m: any) => m.attendees?.some((a: any) => a.toString() === user.id)).length;
+    const attendancePercent = meetings.length === 0 ? 100 : Math.round((attendedMeetings / meetings.length) * 100);
+
+    const completion = lessons.length > 0 ? Math.round((completedLessonIds.length / lessons.length) * 100) : 0;
+    
+    // Academic Rank Logic (Phase Gating)
+    let academicRank = "Gamma";
+    if (completion >= 70 && Object.keys(examResultsMap).length >= 1) academicRank = "Alpha";
+    else if (completion >= 30) academicRank = "Beta";
+
     const stats = {
         totalLessons: lessons.length,
         completedLessons: completedLessonIds.length,
         totalExams: exams.length,
         completedExams: Object.keys(examResultsMap).length,
         averageScore: results.length > 0 ? Math.round(results.reduce((acc: number, r: any) => acc + r.score, 0) / results.length) : 0,
-        overallCompletion: lessons.length > 0 ? Math.round((completedLessonIds.length / lessons.length) * 100) : 0
+        overallCompletion: completion,
+        attendance: attendancePercent,
+        rank: academicRank
     };
 
     return NextResponse.json({ success: true, data: stats });

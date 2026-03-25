@@ -167,7 +167,7 @@ export default function MyProgressPage() {
           <StatCard 
             icon={<Award className="text-purple-600" />} 
             label="Rank" 
-            value={stats?.overallCompletion >= 70 ? "Alpha" : "Beta"}
+            value={stats?.rank || "Gamma"}
             sub="Academic Standing"
             theme="purple"
           />
