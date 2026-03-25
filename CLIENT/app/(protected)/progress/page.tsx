@@ -103,7 +103,7 @@ export default function MyProgressPage() {
                 <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
                     <div className="bg-white/5 border border-white/10 px-6 py-4 rounded-3xl backdrop-blur-md">
                         <span className="block text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-1">Pass Rate</span>
-                        <span className="text-3xl font-black tabular-nums">100%</span>
+                        <span className="text-3xl font-black tabular-nums">{stats?.averageScore || 0}%</span>
                     </div>
                     <div className="bg-white/5 border border-white/10 px-6 py-4 rounded-3xl backdrop-blur-md">
                         <span className="block text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-1">Assessments</span>
@@ -125,12 +125,12 @@ export default function MyProgressPage() {
                             className="stroke-emerald-500 fill-none transition-all duration-1000" 
                             strokeWidth="12" 
                             strokeDasharray="100"
-                            strokeDashoffset={100 - overallProgress}
-                            style={{ strokeDasharray: '283', strokeDashoffset: 283 - (283 * overallProgress / 100) }}
+                            strokeDashoffset={100 - (stats?.overallCompletion || 0)}
+                            style={{ strokeDasharray: '283', strokeDashoffset: 283 - (283 * (stats?.overallCompletion || 0) / 100) }}
                         />
                     </svg>
                     <div className="text-center group cursor-default">
-                        <span className="text-5xl md:text-7xl font-black tracking-tighter block group-hover:scale-110 transition-transform">{Math.round(overallProgress)}%</span>
+                        <span className="text-5xl md:text-7xl font-black tracking-tighter block group-hover:scale-110 transition-transform">{stats?.overallCompletion || 0}%</span>
                         <span className="text-[10px] font-black uppercase tracking-widest text-emerald-100/30">Course Unified</span>
                     </div>
                 </div>
@@ -153,21 +153,21 @@ export default function MyProgressPage() {
           <StatCard 
             icon={<BookOpen className="text-amber-600" />} 
             label="Curriculum Units" 
-            value={`${modules.reduce((a, b) => a + b.completed, 0)}`}
-            sub={`Out of ${modules.reduce((a, b) => a + b.total, 0)} total`}
+            value={`${stats?.completedLessons || 0}`}
+            sub={`Out of ${stats?.totalLessons || 0} total`}
             theme="amber"
           />
           <StatCard 
             icon={<GraduationCap className="text-blue-600" />} 
             label="Gated Exams" 
-            value="Passed"
+            value={`${stats?.completedExams || 0}`}
             sub="Phase-Gate Verified"
             theme="blue"
           />
           <StatCard 
             icon={<Award className="text-purple-600" />} 
             label="Rank" 
-            value="Alpha"
+            value={stats?.overallCompletion >= 70 ? "Alpha" : "Beta"}
             sub="Academic Standing"
             theme="purple"
           />
