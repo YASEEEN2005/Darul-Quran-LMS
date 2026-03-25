@@ -113,7 +113,7 @@ export default function MyProgressPage() {
             </div>
 
             <div className="relative">
-                <div className="w-56 h-56 md:w-72 md:h-72 rounded-full border-[12px] border-white/5 flex items-center justify-center relative shadow-2xl">
+                <div className="w-56 h-56 md:w-72 md:h-72 rounded-full border-12 border-white/5 flex items-center justify-center relative shadow-2xl">
                     <svg className="absolute inset-0 w-full h-full -rotate-90">
                         <circle 
                             cx="50%" cy="50%" r="45%" 
