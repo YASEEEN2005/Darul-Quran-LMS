@@ -185,8 +185,8 @@ export default function ExamsPage() {
                 <GraduationCap size={14} />
                 Knowledge Evaluation
             </div>
-            <h1 className="text-4xl font-black tracking-tighter text-gray-900">Examinations</h1>
-            <p className="text-gray-500 font-medium max-w-lg">
+            <h1 className="text-2xl md:text-4xl font-black tracking-tighter text-gray-900 leading-tight">Examinations</h1>
+            <p className="text-gray-500 font-medium text-xs md:text-base max-w-lg">
                 Complete your course modules to unlock advanced quizzes and certifications.
             </p>
         </div>

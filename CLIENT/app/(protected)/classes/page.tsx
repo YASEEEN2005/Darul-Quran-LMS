@@ -211,8 +211,8 @@ export default function ClassesPage() {
                 <GraduationCap size={16} />
                 LMS Environment
             </div>
-            <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-gray-900 leading-[0.9]">Virtual Classroom</h1>
-            <p className="text-gray-500 font-medium text-sm md:text-base max-w-xl">
+            <h1 className="text-2xl md:text-5xl font-black tracking-tighter text-gray-900 leading-tight">Virtual Classroom</h1>
+            <p className="text-gray-500 font-medium text-xs md:text-base max-w-xl">
                 Engage with immersive university-standard scholarship through our modular academic framework.
             </p>
         </div>

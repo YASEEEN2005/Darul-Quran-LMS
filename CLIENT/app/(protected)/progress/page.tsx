@@ -95,8 +95,8 @@ export default function MyProgressPage() {
                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100">Performance Snapshot</span>
                 </div>
                 <div>
-                   <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-4 leading-tight">Your Academic<br/>Excellence Journey</h1>
-                   <p className="text-emerald-100/40 font-medium max-w-xl text-lg md:text-xl leading-relaxed">
+                   <h1 className="text-2xl md:text-6xl font-black tracking-tighter mb-3 leading-tight">Your Academic<br/>Excellence Journey</h1>
+                   <p className="text-emerald-100/40 font-medium max-w-xl text-sm md:text-xl leading-relaxed">
                       Tracking your progression through the Operating Systems curriculum with institute-standard precision.
                    </p>
                 </div>
@@ -304,14 +304,14 @@ function StatCard({ icon, label, value, sub, theme }: any) {
     };
 
     return (
-        <Card className={cn("rounded-[2rem] border-none shadow-sm flex items-center p-8 gap-6 group hover:scale-[1.02] transition-transform", themes[theme])}>
-            <div className="bg-white p-4 rounded-2xl shadow-inner group-hover:scale-110 transition-transform">
+        <Card className={cn("rounded-[1.5rem] md:rounded-[2rem] border-none shadow-sm flex items-center p-5 md:p-8 gap-4 md:gap-6 group transition-transform", themes[theme])}>
+            <div className="bg-white p-3 md:p-4 rounded-xl md:rounded-2xl shadow-inner group-hover:scale-110 transition-transform shrink-0">
                 {icon}
             </div>
             <div>
-                <span className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1 block">{label}</span>
-                <div className="text-2xl font-black tracking-tighter tabular-nums mb-0.5">{value}</div>
-                <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest leading-none">{sub}</p>
+                <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest opacity-40 mb-0.5 block">{label}</span>
+                <div className="text-xl md:text-2xl font-black tracking-tighter tabular-nums mb-0.5">{value}</div>
+                <p className="text-[8px] md:text-[10px] font-bold opacity-30 uppercase tracking-widest leading-none">{sub}</p>
             </div>
         </Card>
     );

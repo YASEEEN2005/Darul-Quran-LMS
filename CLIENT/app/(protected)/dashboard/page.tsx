@@ -96,17 +96,17 @@ export default function DashboardPage() {
                 <Sparkles size={12} className="animate-spin-slow" />
                 Institute Performance Tier
             </motion.div>
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight leading-tight">
+            <h1 className="text-2xl md:text-6xl font-black text-white mb-4 tracking-tight leading-tight">
                 Salaam, <span className="text-emerald-400">{user?.name?.split(' ')[0]}</span>. <br className="hidden md:block" />
                 Ready for <span className="underline decoration-emerald-500/30 decoration-8 underline-offset-4">Module {stats?.completedExams + 1 || 1}</span>?
             </h1>
-            <p className="text-emerald-100/40 text-lg font-medium leading-relaxed mb-10 max-w-lg">
-                Your academic journey through Operating Systems is being recorded with secure verification. Resume your latest unit below.
+            <p className="text-emerald-100/40 text-sm md:text-lg font-medium leading-relaxed mb-8 max-w-lg">
+                Your academic journey through Operating Systems is being recorded with secure verification.
             </p>
             <Link href="/classes">
-                <Button className="h-16 px-10 rounded-[1.5rem] bg-emerald-500 hover:bg-emerald-400 text-white font-black text-lg shadow-[0_20px_40px_rgba(16,185,129,0.2)] transition-all hover:scale-105 active:scale-95 group">
-                    Enter Virtual Classroom
-                    <ArrowUpRight className="ml-3 w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                <Button className="h-12 md:h-16 px-8 md:px-10 rounded-[1.25rem] md:rounded-[1.5rem] bg-emerald-500 hover:bg-emerald-400 text-white font-black text-sm md:text-lg shadow-[0_20px_40px_rgba(16,185,129,0.2)] transition-all">
+                    Enter Classroom
+                    <ArrowUpRight className="ml-2 w-5 h-5" />
                 </Button>
             </Link>
           </div>
@@ -284,20 +284,20 @@ function StatItem({ label, value, icon: Icon, trend, theme }: any) {
     return (
         <motion.div 
             variants={{ hidden: { opacity: 0, scale: 0.95 }, show: { opacity: 1, scale: 1 } }}
-            className="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/5 transition-all duration-500 group relative overflow-hidden cursor-default"
+            className="bg-white rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-8 border border-gray-100 shadow-sm transition-all duration-500 group relative overflow-hidden"
         >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 transition-all duration-700 group-hover:scale-125"></div>
+            <div className="absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-emerald-50 rounded-full -mr-12 md:-mr-16 -mt-12 md:-mt-16"></div>
             <div className="relative z-10">
-                <div className="flex justify-between items-start mb-8">
-                    <div className="p-4 rounded-2xl bg-emerald-50 text-emerald-600 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 shadow-inner">
-                        <Icon size={24} strokeWidth={2.5} />
+                <div className="flex justify-between items-start mb-4 md:mb-8">
+                    <div className="p-3 md:p-4 rounded-xl md:rounded-2xl bg-emerald-50 text-emerald-600 shadow-inner">
+                        <Icon size={20} className="md:w-6 md:h-6" strokeWidth={2.5} />
                     </div>
                 </div>
-                <h3 className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">{label}</h3>
+                <h3 className="text-gray-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] mb-1.5">{label}</h3>
                 <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-black text-gray-900 tracking-tighter tabular-nums">{value}</span>
+                    <span className="text-xl md:text-3xl font-black text-gray-900 tracking-tighter tabular-nums">{value}</span>
                 </div>
-                <div className="mt-6 flex items-center text-[10px] font-black text-emerald-600 gap-2 bg-emerald-50 w-fit px-4 py-1.5 rounded-full border border-emerald-100/50">
+                <div className="mt-4 md:mt-6 flex items-center text-[9px] font-black text-emerald-600 gap-2 bg-emerald-50 w-fit px-3 py-1 rounded-full border border-emerald-100/50">
                     <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                     {trend}
                 </div>
