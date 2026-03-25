@@ -21,12 +21,16 @@ import { useToast } from "@/lib/toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
+import YouTubeLMSPlayer from "@/components/video/YouTubeLMSPlayer";
+
 interface Lesson {
   id: string;
   courseId: string;
   title: string;
   videoUrl: string;
   orderIndex: number;
+  isCompleted: boolean;
+  isLocked: boolean;
 }
 
 export default function ClassesPage() {
@@ -58,17 +62,26 @@ export default function ClassesPage() {
     }
   };
 
+  const fetchLessons = async (courseId: string) => {
+    setIsLoading(true);
+    try {
+      const res = await api.get(`/lessons/${courseId}`);
+      if (res.success) {
+        setLessons(res.data);
+        // Find the first unlocked lesson that is not completed
+        const nextLesson = res.data.find((l: Lesson) => !l.isCompleted && !l.isLocked) || res.data[0];
+        if (nextLesson && !activeVideoId) {
+          setActiveVideoId(nextLesson.id);
+        }
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (selectedCourse) {
-      setIsLoading(true);
-      api.get(`/lessons/${selectedCourse}`).then(res => {
-        if (res.success) {
-          setLessons(res.data);
-          if (res.data.length > 0 && !activeVideoId) {
-            setActiveVideoId(res.data[0].id);
-          }
-        }
-      }).finally(() => setIsLoading(false));
+      fetchLessons(selectedCourse);
     }
   }, [selectedCourse]);
 
@@ -78,14 +91,42 @@ export default function ClassesPage() {
     if (activeVideoId) {
       await markLessonComplete(activeVideoId);
       toast({
-        title: "Spiritually Rewarding!",
-        description: "You've successfully completed this lesson. Your progress is saved.",
+        title: "Lesson Accomplished!",
+        description: "Your progress has been synchronized with the Darul-Quran database.",
       });
-      // Refresh lessons
+      
+      // Immediately fetch updated lessons to unlock next
       if (selectedCourse) {
-        api.get(`/lessons/${selectedCourse}`).then(res => setLessons(res.data));
+          const res = await api.get(`/lessons/${selectedCourse}`);
+          if (res.success) {
+              setLessons(res.data);
+              // Auto-advance to next lesson if available
+              const nextIdx = lessons.findIndex(l => l.id === activeVideoId) + 1;
+              if (nextIdx < res.data.length && !res.data[nextIdx].isLocked) {
+                  setActiveVideoId(res.data[nextIdx].id);
+              }
+          }
       }
     }
+  };
+
+  const selectLesson = (lesson: Lesson) => {
+    if (lesson.isLocked) {
+        toast({
+            variant: "destructive",
+            title: "Access Restricted",
+            description: "You must complete the preceding lessons before advancing to this stage.",
+        });
+        return;
+    }
+    setActiveVideoId(lesson.id);
+  };
+
+  // Extract YouTube ID from URL
+  const getYouTubeId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
   };
 
   return (
@@ -100,7 +141,7 @@ export default function ClassesPage() {
             </div>
             <h1 className="text-4xl font-black tracking-tighter text-gray-900">Virtual Classroom</h1>
             <p className="text-gray-500 font-medium max-w-lg">
-                Engage with premium Quranic scholarship through structured video modules.
+                Engage with premium scholarship through structured video modules.
             </p>
         </div>
         
@@ -128,23 +169,11 @@ export default function ClassesPage() {
             >
                 {activeLesson ? (
                     <div className="relative w-full h-full overflow-hidden scale-[1.01]">
-                        {/* The Iframe is sized slightly larger to crop out default UI edges */}
-                        <iframe 
-                            className="absolute inset-0 w-full h-full pointer-events-auto"
-                            src={`${activeLesson.videoUrl}?autoplay=0&rel=0&modestbranding=1&controls=1&showinfo=0&iv_load_policy=3&disablekb=1&fs=0`}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                        ></iframe>
-                        
-                        {/* Interactive Overlay To Block YouTube Logo/Title Click-throughs if desired */}
-                        <div className="absolute top-0 left-0 w-full h-16 bg-linear-to-b from-[#011c18]/80 to-transparent pointer-events-none z-10 flex items-center px-10">
-                            <span className="text-emerald-400/40 text-[10px] uppercase font-black tracking-widest">Secure LMS Player • {activeLesson.title}</span>
-                        </div>
-                        
-                        {/* Blocking the YouTube Logo in bottom right corner */}
-                        <div className="absolute bottom-12 right-12 w-32 h-12 bg-[#011c18] z-20 rounded-2xl flex items-center justify-center border border-white/10 text-[10px] font-black text-emerald-400 uppercase tracking-widest pointer-events-none shadow-2xl">
-                            DARUL-QURAN
-                        </div>
+                        <YouTubeLMSPlayer 
+                            videoId={getYouTubeId(activeLesson.videoUrl) || ""} 
+                            onComplete={handleVideoComplete}
+                            title={activeLesson.title}
+                        />
                     </div>
                 ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-center p-12 space-y-4">
@@ -171,6 +200,12 @@ export default function ClassesPage() {
                                 <span className="px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-100">
                                     Module {activeLesson?.orderIndex || 1}
                                 </span>
+                                {activeLesson?.isCompleted && (
+                                    <span className="px-4 py-1.5 bg-green-50 text-green-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-green-100 flex items-center gap-1.5">
+                                        <CheckCircle2 size={12} />
+                                        Completed
+                                    </span>
+                                )}
                                 <div className="flex items-center gap-1.5 text-gray-400 font-bold text-xs uppercase tracking-widest">
                                     <Clock size={12} />
                                     15:00 Duration
@@ -191,12 +226,14 @@ export default function ClassesPage() {
                                     <Share2 size={18} className="text-emerald-600" />
                                     Share Progress
                                 </Button>
-                                <Button 
-                                    onClick={handleVideoComplete}
-                                    className="h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 shadow-xl shadow-emerald-500/10"
-                                >
-                                    Mark as Complete
-                                </Button>
+                                {!activeLesson?.isCompleted && (
+                                    <Button 
+                                        disabled
+                                        className="h-12 rounded-xl bg-gray-100 text-gray-400 font-bold px-8 shadow-none"
+                                    >
+                                        Watching Required
+                                    </Button>
+                                )}
                             </div>
                         </div>
 
@@ -204,10 +241,10 @@ export default function ClassesPage() {
                             <div className="p-6 bg-emerald-50 rounded-[2rem] border border-emerald-100/50">
                                 <div className="flex items-center gap-2 mb-4">
                                     <Info className="text-emerald-600" size={18} />
-                                    <span className="text-xs font-black uppercase tracking-widest text-emerald-700">Student Guide</span>
+                                    <span className="text-xs font-black uppercase tracking-widest text-emerald-700">Guide</span>
                                 </div>
                                 <p className="text-[13px] text-emerald-900/60 font-medium leading-relaxed">
-                                    Watching this lesson entirely will automatically unlock the next session and your assessment quiz.
+                                    Watching this session until the end will automatically unlock the next phase of your curriculum. Skipping is restricted.
                                 </p>
                             </div>
                         </div>
@@ -226,7 +263,7 @@ export default function ClassesPage() {
                     ))
                 ) : lessons.length === 0 ? (
                     <div className="p-8 bg-gray-50 border border-dashed border-gray-200 rounded-[2rem] text-center text-gray-400 font-medium">
-                        No lessons assigned to this course.
+                        No lessons assigned.
                     </div>
                 ) : (
                     lessons.map((lesson, idx) => {
@@ -234,13 +271,15 @@ export default function ClassesPage() {
                         return (
                             <motion.div 
                                 key={lesson.id}
-                                whileHover={{ x: 5 }}
-                                onClick={() => setActiveVideoId(lesson.id)}
+                                whileHover={!lesson.isLocked ? { x: 5 } : {}}
+                                onClick={() => selectLesson(lesson)}
                                 className={cn(
                                     "p-6 rounded-[2rem] cursor-pointer transition-all duration-400 group relative border",
                                     isActive 
                                         ? "bg-white border-emerald-100 shadow-xl shadow-emerald-900/5" 
-                                        : "bg-gray-50/50 border-transparent hover:bg-white hover:border-gray-100"
+                                        : lesson.isLocked 
+                                          ? "bg-gray-50/50 opacity-40 grayscale cursor-not-allowed border-transparent"
+                                          : "bg-gray-50/50 border-transparent hover:bg-white hover:border-gray-100"
                                 )}
                             >
                                 {isActive && (
@@ -251,7 +290,7 @@ export default function ClassesPage() {
                                         "w-12 h-12 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110",
                                         isActive ? "bg-emerald-600 text-white" : "bg-white border border-gray-100 text-gray-400 group-hover:text-emerald-500"
                                     )}>
-                                        {isActive ? <Play size={18} fill="currentColor" /> : <PlayCircle size={20} />}
+                                        {lesson.isLocked ? <Lock size={16} /> : lesson.isCompleted ? <CheckCircle2 size={18} className="text-emerald-600" /> : <Play size={18} fill="currentColor" />}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h4 className={cn(
@@ -262,29 +301,14 @@ export default function ClassesPage() {
                                         </h4>
                                         <div className="flex items-center gap-2">
                                             <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600/60">Module {lesson.orderIndex}</span>
-                                            <div className="w-1 h-1 rounded-full bg-gray-200"></div>
-                                            <span className="text-[10px] font-bold text-gray-300">15 min</span>
+                                            {lesson.isLocked && <span className="text-[9px] font-black text-amber-600 uppercase tracking-widest bg-amber-50 px-2 py-0.5 rounded">Locked</span>}
                                         </div>
                                     </div>
-                                    {isActive && (
-                                        <ChevronRight size={18} className="text-emerald-200" />
-                                    )}
                                 </div>
                             </motion.div>
                         );
                     })
                 )}
-
-                {/* Locked State Preview */}
-                <div className="p-6 rounded-[2rem] bg-gray-50/20 border border-dashed border-gray-100 opacity-40 grayscale flex items-center gap-6">
-                    <div className="w-12 h-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-gray-400">
-                        <Lock size={18} strokeWidth={2.5} />
-                    </div>
-                    <div>
-                        <h4 className="text-sm font-black tracking-tight text-gray-400 uppercase">Assessment Quiz</h4>
-                        <span className="text-[10px] font-bold text-gray-300 tracking-widest">LOCKED UNTIL COMPLETION</span>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -292,3 +316,4 @@ export default function ClassesPage() {
     </div>
   );
 }
+

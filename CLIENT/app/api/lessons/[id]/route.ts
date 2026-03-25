@@ -18,24 +18,28 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ success: true, count: 0, data: [] });
     }
 
-    if (user.role === "ADMIN") {
-      const formatted = lessons.map((l: any) => ({ ...l, id: l._id.toString() }));
-      return NextResponse.json({ success: true, count: formatted.length, data: formatted });
-    }
+    const progresses = await LessonProgress.find({ userId: user.id }).lean();
+    const completedLessonIds = progresses.filter((p: any) => p.completed).map((p: any) => p.lessonId.toString());
 
-    const progresses = await LessonProgress.find({ userId: user.id })
-      .populate('lessonId')
-      .lean();
-
-    let maxCompletedIndex = 0;
+    let maxCompletedOrder = 0;
     progresses.forEach((p: any) => {
-      if (p.completed && p.lessonId && p.lessonId.courseId.toString() === courseId && p.lessonId.orderIndex > maxCompletedIndex) {
-        maxCompletedIndex = p.lessonId.orderIndex;
+      const lesson = lessons.find((l: any) => l._id.toString() === p.lessonId.toString());
+      if (p.completed && lesson && lesson.orderIndex > maxCompletedOrder) {
+        maxCompletedOrder = lesson.orderIndex;
       }
     });
 
-    const unlockedLessons = lessons.filter((lesson: any) => lesson.orderIndex <= maxCompletedIndex + 1);
-    const formatted = unlockedLessons.map((l: any) => ({ ...l, id: l._id.toString() }));
+    const formatted = lessons.map((l: any) => {
+      const isCompleted = completedLessonIds.includes(l._id.toString());
+      const isLocked = user.role !== "ADMIN" && l.orderIndex > maxCompletedOrder + 1;
+      
+      return {
+        ...l,
+        id: l._id.toString(),
+        isCompleted,
+        isLocked,
+      };
+    });
 
     return NextResponse.json({ success: true, count: formatted.length, data: formatted });
   } catch (error: any) {
