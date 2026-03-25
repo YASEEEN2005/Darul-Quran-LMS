@@ -31,7 +31,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const formatted = lessons.map((l: any) => {
       const isCompleted = completedLessonIds.includes(l._id.toString());
-      const isLocked = user.role !== "ADMIN" && l.orderIndex > maxCompletedOrder + 1;
+      
+      // A lesson is locked if its order is greater than (max completed + 1)
+      const isLocked = l.orderIndex > maxCompletedOrder + 1;
       
       return {
         ...l,

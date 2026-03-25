@@ -19,7 +19,7 @@ function LoginForm() {
     if (error) {
       let errorMessage = "An error occurred during authentication.";
       if (error === "user_not_found") errorMessage = "Could not verify your Google account.";
-      if (error === "not_approved") errorMessage = "wait for admin approval";
+      if (error === "not_approved") errorMessage = "Wait for admin approval";
       if (error === "session_expired") errorMessage = "Your session has expired. Please log in again.";
 
       toast({
