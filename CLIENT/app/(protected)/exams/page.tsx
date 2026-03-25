@@ -19,6 +19,7 @@ import {
 import { useProgressStore } from "@/store/progressStore";
 import { useToast } from "@/lib/toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export default function ExamsPage() {
   const [exams, setExams] = useState<any[]>([]);
@@ -216,25 +217,40 @@ export default function ExamsPage() {
           </div>
         ) : (
           <AnimatePresence>
-            {exams.map((exam, idx) => (
+            {exams.map((exam, idx) => {
+              const isLocked = exam.isLocked;
+              return (
               <motion.div 
                 key={exam.id}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.1 }}
-                whileHover={{ y: -8 }}
+                whileHover={!isLocked ? { y: -8 } : {}}
               >
-                <Card className="flex flex-col h-full bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-900/10 transition-all duration-700 overflow-hidden relative group">
+                <Card className={cn(
+                    "flex flex-col h-full bg-white rounded-[2.5rem] border transition-all duration-700 overflow-hidden relative group",
+                    isLocked ? "border-gray-100 opacity-60 grayscale cursor-not-allowed" : "border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-900/10"
+                )}>
+                  {isLocked && (
+                    <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/5 backdrop-blur-[1px]">
+                        <div className="bg-white/80 p-4 rounded-full shadow-2xl border border-gray-100">
+                             <Lock className="h-8 w-8 text-gray-400" />
+                        </div>
+                    </div>
+                  )}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 group-hover:bg-emerald-500/10 transition-all duration-700"></div>
                   <CardHeader className="p-8 pb-4">
-                    <div className="bg-emerald-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-inner border border-emerald-100/50">
-                      <FileEdit className="h-6 w-6 text-emerald-600" strokeWidth={2.5} />
+                    <div className={cn(
+                        "w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform shadow-inner border",
+                        isLocked ? "bg-gray-100 border-gray-200" : "bg-emerald-50 border-emerald-100/50 group-hover:scale-110"
+                    )}>
+                      {isLocked ? <Lock className="h-6 w-6 text-gray-300" /> : <FileEdit className="h-6 w-6 text-emerald-600" strokeWidth={2.5} />}
                     </div>
                     <CardTitle className="text-2xl font-black text-gray-900 tracking-tight leading-tight mb-2">{exam.title}</CardTitle>
                     <div className="flex items-center gap-2">
                          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600/50">Module {exam.orderIndex}</span>
                          <div className="w-1 h-1 rounded-full bg-gray-200"></div>
-                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Digital Quiz</span>
+                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{isLocked ? 'Locked' : 'Available'} Assessment</span>
                     </div>
                   </CardHeader>
                   <CardContent className="p-8 pt-0 flex-1">
@@ -250,16 +266,22 @@ export default function ExamsPage() {
                   </CardContent>
                   <CardFooter className="p-8 pt-0">
                     <Button 
-                        className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-[#011c18] text-white font-black shadow-lg shadow-emerald-500/10 group-hover:shadow-emerald-500/20 transition-all flex gap-3"
+                        disabled={isLocked}
+                        className={cn(
+                            "w-full h-14 rounded-2xl font-black shadow-lg transition-all flex gap-3",
+                            isLocked 
+                                ? "bg-gray-100 text-gray-400 border-gray-200" 
+                                : "bg-emerald-600 hover:bg-[#011c18] text-white shadow-emerald-500/10 group-hover:shadow-emerald-500/20"
+                        )}
                         onClick={() => setActiveExam(exam)}
                     >
-                        Initiate Assessment
-                        <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        {isLocked ? 'Access Restricted' : 'Initiate Assessment'}
+                        {!isLocked && <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />}
                     </Button>
                   </CardFooter>
                 </Card>
               </motion.div>
-            ))}
+            )})}
             
             {/* Visual locked placeholder */}
             <div className="bg-gray-50/30 rounded-[2.5rem] border border-dashed border-gray-200 p-8 flex flex-col justify-center items-center text-center opacity-60 grayscale scale-95 pointer-events-none">
