@@ -71,8 +71,50 @@ export async function GET() {
     for (let i = 0; i < quranLessons.length; i++) {
         await Lesson.create({
             courseId: quranCourse._id,
-            title: `Session ${i + 1}: ${quranLessons[i].title}`,
+            title: quranLessons[i].title,
             videoUrl: `https://www.youtube.com/embed/${quranLessons[i].id}`,
+            orderIndex: i + 1,
+        });
+    }
+
+    // 4. Fiqh Course
+    const fiqhCourse = await Course.create({
+        title: "Foundations of Islamic Fiqh",
+        description: "An introduction to the practical rules of Islamic living, focusing on Taharah (purification) and Salah (prayer).",
+    });
+
+    const fiqhLessons = [
+        { title: "Understanding Fiqh & Its Sources", id: "pDmEYRhyusU" },
+        { title: "Rules of Taharah (Purification)", id: "pDmEYRhyusU" },
+        { title: "The Pillar of Salah", id: "pDmEYRhyusU" },
+    ];
+
+    for (let i = 0; i < fiqhLessons.length; i++) {
+        await Lesson.create({
+            courseId: fiqhCourse._id,
+            title: fiqhLessons[i].title,
+            videoUrl: `https://www.youtube.com/embed/${fiqhLessons[i].id}`,
+            orderIndex: i + 1,
+        });
+    }
+
+    // 5. Seerah Course
+    const seerahCourse = await Course.create({
+        title: "Life of the Prophet Muhammad (ﷺ)",
+        description: "A chronological journey through the life of the final Messenger, exploring his character, mission, and legacy.",
+    });
+
+    const seerahLessons = [
+        { title: "The Pre-Islamic World", id: "XW7HI6ajZfo" },
+        { title: "Early Life in Makkah", id: "XW7HI6ajZfo" },
+        { title: "The Revelation & Da'wah", id: "XW7HI6ajZfo" },
+    ];
+
+    for (let i = 0; i < seerahLessons.length; i++) {
+        await Lesson.create({
+            courseId: seerahCourse._id,
+            title: seerahLessons[i].title,
+            videoUrl: `https://www.youtube.com/embed/${seerahLessons[i].id}`,
             orderIndex: i + 1,
         });
     }
@@ -103,9 +145,9 @@ export async function GET() {
 
     return NextResponse.json({ 
         success: true, 
-        message: "Database seeded successfully with your playlist!",
-        coursesCreated: 2,
-        lessonsCreated: 2 + playlist.length,
+        message: "Database seeded successfully with premium curriculum!",
+        coursesCreated: 4,
+        lessonsCreated: playlist.length + quranLessons.length + fiqhLessons.length + seerahLessons.length,
         examsCreated: 1
     });
 

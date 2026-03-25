@@ -39,6 +39,7 @@ export default function ClassesPage() {
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentDuration, setCurrentDuration] = useState<number>(0);
   
   const { markLessonComplete } = useProgressStore();
   const { toast } = useToast();
@@ -68,7 +69,6 @@ export default function ClassesPage() {
       const res = await api.get(`/lessons/${courseId}`);
       if (res.success) {
         setLessons(res.data);
-        // Find the first unlocked lesson that is not completed
         const nextLesson = res.data.find((l: Lesson) => !l.isCompleted && !l.isLocked) || res.data[0];
         if (nextLesson && !activeVideoId) {
           setActiveVideoId(nextLesson.id);
@@ -87,20 +87,24 @@ export default function ClassesPage() {
 
   const activeLesson = lessons.find(l => l.id === activeVideoId);
 
+  const handleProgress = (time: number, duration: number) => {
+    if (duration > 0 && currentDuration !== duration) {
+        setCurrentDuration(duration);
+    }
+  };
+
   const handleVideoComplete = async () => {
     if (activeVideoId) {
       await markLessonComplete(activeVideoId);
       toast({
         title: "Lesson Accomplished!",
-        description: "Your progress has been synchronized with the Darul-Quran database.",
+        description: "Your progress has been synchronized with our database.",
       });
       
-      // Immediately fetch updated lessons to unlock next
       if (selectedCourse) {
           const res = await api.get(`/lessons/${selectedCourse}`);
           if (res.success) {
               setLessons(res.data);
-              // Auto-advance to next lesson if available
               const nextIdx = lessons.findIndex(l => l.id === activeVideoId) + 1;
               if (nextIdx < res.data.length && !res.data[nextIdx].isLocked) {
                   setActiveVideoId(res.data[nextIdx].id);
@@ -115,24 +119,42 @@ export default function ClassesPage() {
         toast({
             variant: "destructive",
             title: "Access Restricted",
-            description: "You must complete the preceding lessons before advancing to this stage.",
+            description: "Complete preceding lessons to unlock this.",
         });
         return;
     }
     setActiveVideoId(lesson.id);
   };
 
-  // Extract YouTube ID from URL
   const getYouTubeId = (url: string) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
+  const handleDownloadNotes = () => {
+    toast({
+        title: "Generating PDF...",
+        description: `Preparing study notes for: ${activeLesson?.title}`,
+    });
+    setTimeout(() => {
+        window.open('https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', '_blank');
+    }, 1500);
+  };
+
+  const handleShareProgress = () => {
+    const text = `I'm mastering "${activeLesson?.title}" on Darul-Quran!`;
+    if (navigator.share) {
+        navigator.share({ title: 'My Progress', text, url: window.location.href });
+    } else {
+        navigator.clipboard.writeText(`${text} ${window.location.href}`);
+        toast({ title: "Link Copied!", description: "Link copied to clipboard." });
+    }
+  };
+
   return (
     <div className="space-y-10 max-w-[1400px] mx-auto pb-20">
       
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4 md:px-0">
         <div className="space-y-2">
             <div className="flex items-center gap-2 text-emerald-600 font-black uppercase tracking-[0.2em] text-[10px]">
@@ -145,12 +167,11 @@ export default function ClassesPage() {
             </p>
         </div>
         
-        {/* Course Selector Tabs */}
         <div className="flex bg-gray-100/50 p-1.5 rounded-[1.5rem] border border-gray-100 overflow-x-auto scrollbar-hide max-w-full">
             {courses.map(course => (
                 <button 
                     key={course.id}
-                    onClick={() => setSelectedCourse(course.id)}
+                    onClick={() => { setSelectedCourse(course.id); setActiveVideoId(null); }}
                     className={`whitespace-nowrap px-6 py-3 rounded-2xl text-[13px] font-black transition-all duration-300 ${selectedCourse === course.id ? 'bg-white text-emerald-700 shadow-xl shadow-emerald-900/5' : 'text-gray-400 hover:text-gray-600 cursor-pointer'}`}
                 >
                     {course.title}
@@ -161,7 +182,6 @@ export default function ClassesPage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
         
-        {/* Video Player Column */}
         <div className="xl:col-span-2 space-y-8">
             <motion.div 
                 layoutId="player"
@@ -172,6 +192,7 @@ export default function ClassesPage() {
                         <YouTubeLMSPlayer 
                             videoId={getYouTubeId(activeLesson.videoUrl) || ""} 
                             onComplete={handleVideoComplete}
+                            onProgress={handleProgress}
                             title={activeLesson.title}
                         />
                     </div>
@@ -185,7 +206,6 @@ export default function ClassesPage() {
                 )}
             </motion.div>
 
-            {/* Video Info Card */}
             <AnimatePresence mode="wait">
                 <motion.div 
                     key={activeVideoId}
@@ -208,21 +228,27 @@ export default function ClassesPage() {
                                 )}
                                 <div className="flex items-center gap-1.5 text-gray-400 font-bold text-xs uppercase tracking-widest">
                                     <Clock size={12} />
-                                    15:00 Duration
+                                    {currentDuration > 0 ? `${Math.floor(currentDuration / 60)}:${Math.floor(currentDuration % 60).toString().padStart(2, '0')}` : "Loading..."} Duration
                                 </div>
                             </div>
                             <h2 className="text-3xl font-black text-gray-900 tracking-tight leading-tight">
                                 {activeLesson?.title || "Choose a lesson"}
                             </h2>
                             <p className="text-gray-500 text-lg leading-relaxed font-medium">
-                                In this lesson, we explore the deep linguistic nuances and spiritual teachings of the Quran. Take notes and ensure your environment is quiet for optimal concentration.
+                                {courses.find(c => c.id === selectedCourse)?.description || "In this lesson, we explore the deep linguistic nuances and spiritual teachings of the Quran."}
                             </p>
                             <div className="flex flex-wrap gap-4 pt-4">
-                                <Button variant="outline" className="h-12 rounded-xl border-gray-100 px-6 font-bold text-gray-700 hover:bg-gray-50 flex gap-2">
+                                <Button 
+                                    onClick={handleDownloadNotes}
+                                    variant="outline" className="h-12 rounded-xl border-gray-100 px-6 font-bold text-gray-700 hover:bg-gray-50 flex gap-2"
+                                >
                                     <FileText size={18} className="text-emerald-600" />
                                     Lesson Notes (PDF)
                                 </Button>
-                                <Button variant="outline" className="h-12 rounded-xl border-gray-100 px-6 font-bold text-gray-700 hover:bg-gray-50 flex gap-2">
+                                <Button 
+                                    onClick={handleShareProgress}
+                                    variant="outline" className="h-12 rounded-xl border-gray-100 px-6 font-bold text-gray-700 hover:bg-gray-50 flex gap-2"
+                                >
                                     <Share2 size={18} className="text-emerald-600" />
                                     Share Progress
                                 </Button>
@@ -253,7 +279,6 @@ export default function ClassesPage() {
             </AnimatePresence>
         </div>
 
-        {/* Sidebar Lesson List */}
         <div className="space-y-6">
             <h3 className="text-xl font-black text-gray-900 px-2 tracking-tight">Curriculum Breakdown</h3>
             <div className="space-y-3">
@@ -266,7 +291,7 @@ export default function ClassesPage() {
                         No lessons assigned.
                     </div>
                 ) : (
-                    lessons.map((lesson, idx) => {
+                    lessons.map((lesson) => {
                         const isActive = activeVideoId === lesson.id;
                         return (
                             <motion.div 
@@ -316,4 +341,3 @@ export default function ClassesPage() {
     </div>
   );
 }
-
