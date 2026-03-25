@@ -159,16 +159,16 @@ export default function MyProgressPage() {
           />
           <StatCard 
             icon={<GraduationCap className="text-blue-600" />} 
-            label="Gated Exams" 
-            value={`${stats?.completedExams || 0}`}
-            sub="Phase-Gate Verified"
+            label="Gated Modules" 
+            value={`${stats?.completedExams || 0} Gated`}
+            sub="Passed Assessments"
             theme="blue"
           />
           <StatCard 
             icon={<Award className="text-purple-600" />} 
-            label="Rank" 
-            value={stats?.rank || "Gamma"}
-            sub="Academic Standing"
+            label="Syllabus Mastery" 
+            value={`${stats?.overallCompletion || 0}%`}
+            sub="Certified Progress"
             theme="purple"
           />
       </div>
