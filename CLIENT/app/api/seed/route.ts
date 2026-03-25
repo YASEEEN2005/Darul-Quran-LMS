@@ -9,90 +9,104 @@ export async function GET() {
   try {
     await dbConnect();
 
-    // Clear existing data
+    // 1. Wipe all existing data for a clean slate
     await Course.deleteMany({});
     await Lesson.deleteMany({});
     await Exam.deleteMany({});
-    await User.deleteMany({});
+    // We keep existing users for login persistence
 
-    // 0. Create Users
-    const demoUser = await User.create({
-        email: "navaneethpv550@gmail.com",
-        name: "Navaneeth PV",
-        role: "ADMIN",
-        approved: true,
-        googleId: "123456789", // Mock ID
+    // 2. Create the production-grade OS Course
+    const osCourse = await Course.create({
+        title: "Operating Systems (BMS/BCA 6th Sem)",
+        description: "Official Calicut University curriculum covering OS fundamentals, Process Management, Memory, and File Systems. Taught by industry experts via Gate Smashers series.",
     });
 
-    const demoStudent = await User.create({
-        email: "student@example.com",
-        name: "Demo Student",
-        role: "STUDENT",
-        approved: true,
-    });
-
-    // 1. Create the User's C Programming Course (from playlist)
-    const cCourse = await Course.create({
-        title: "C Programming Malayalam Tutorial",
-        description: "A comprehensive guide to C programming in Malayalam. Covers fundamentals, variables, loops, and more.",
-    });
-
-    const playlist = [
-        { title: "Part 1 | Introduction To Programming", id: "pDmEYRhyusU" },
-        { title: "Linux Installation | Eclipse IDE", id: "XW7HI6ajZfo" },
-        { title: "Part 2 | Variables Datatypes & I/O", id: "qGGqnzvKjmM" },
-        { title: "Part 3 | Conditional Statements", id: "W7s0upNfcKY" },
-        { title: "Part 4 | Loops: FOR Loop", id: "YfaJzXFbFcQ" },
-        { title: "Part 5 | Array and Array Operations", id: "d0drJeqmiws" },
+    // Module 1 Contents (Intro & Types)
+    const module1 = [
+        { title: "Definition & Objectives of OS", id: "FYmHy0St6G4", order: 1 },
+        { title: "Primary Functions of OS", id: "-gdvC1th8PU", order: 2 },
+        { title: "Serial Processing Systems", id: "YDrxwum0VTE", order: 3 },
+        { title: "Batch Processing Systems", id: "xnqxjdGoYW4", order: 4 },
+        { title: "Multiprogramming & CPU Utilization", id: "rxUHUcYjA-A", order: 5 },
+        { title: "Time Sharing Systems", id: "tkqFOtXOGI8", order: 6 },
+        { title: "Parallel Processing (Symmetric/Asymmetric)", id: "fOC8ObALUnw", order: 7 },
+        { title: "Distributed Operating Systems", id: "zSY-K2B7Erc", order: 8 },
+        { title: "Real-Time OS (Hard vs Soft)", id: "nETI5zUve8g", order: 9 }
     ];
 
-    for (let i = 0; i < playlist.length; i++) {
+    for (const l of module1) {
         await Lesson.create({
-            courseId: cCourse._id,
-            title: playlist[i].title,
-            videoUrl: `https://www.youtube.com/embed/${playlist[i].id}`,
-            orderIndex: i + 1,
+            courseId: osCourse._id,
+            title: l.title,
+            videoUrl: `https://www.youtube.com/embed/${l.id}`,
+            orderIndex: l.order,
+            moduleNumber: 1
         });
     }
 
-    // 2. Create Quran Course
-    const quranCourse = await Course.create({
-      title: "Mastering Quranic Tajweed",
-      description: "Learn the proper pronunciation and rules of Quran recitation from basics to advanced levels. Master the Makhaarij and rules of Noon/Meem Sakinah.",
-    });
-
-    await Lesson.create({
-      courseId: quranCourse._id,
-      title: "Introduction to Makharij",
-      videoUrl: "https://www.youtube.com/embed/97_y1tX-fsw",
-      orderIndex: 1,
-    });
-
-    // 3. Create a Demo Exam for the C Course
+    // Module 1 Phase-Gate Exam
     await Exam.create({
-        courseId: cCourse._id,
-        title: "C Fundamentals Quiz",
-        orderIndex: 1,
+        courseId: osCourse._id,
+        title: "Module 1: Fundamental Assessment",
+        orderIndex: 1, 
+        moduleNumber: 1,
         questions: [
-            {
-                text: "Which of the following is a literal in C?",
-                options: ["123", "int", "float", "main"],
-                correctOptionIndex: 0,
+            { 
+                text: "What are the three primary objectives of an Operating System?", 
+                options: ["Speed, Cost, Storage", "Convenience, Efficiency, Evolvability", "Gaming, Browsing, Typing", "None of the above"], 
+                correctOptionIndex: 1 
             },
-            {
-                text: "What is the size of 'int' on most 64-bit systems?",
-                options: ["2 bytes", "4 bytes", "8 bytes", "Depends on compiler"],
-                correctOptionIndex: 1,
+            { 
+                text: "In Multiprogramming, what happens when the current job waits for I/O?", 
+                options: ["CPU remains idle", "System crashes", "CPU switches to another job", "Computer restarts"], 
+                correctOptionIndex: 2 
+            },
+            { 
+                text: "Which system has absolute deadlines and zero tolerance for delay?", 
+                options: ["Soft Real-Time", "Hard Real-Time", "Time Sharing", "Parallel Processing"], 
+                correctOptionIndex: 1 
             }
+        ]
+    });
+
+    // Module 2 Contents (Process Management)
+    const module2 = [
+        { title: "Process: Definition & Structure", id: "w0w8b97fPDY", order: 10 },
+        { title: "The 5-State Process Model", id: "NoU19Bfp0s0", order: 11 },
+        { title: "Process Control Block (PCB)", id: "Lh_j7ZatpY0", order: 12 },
+        { title: "Intro to CPU Scheduling", id: "zF9G824S8uU", order: 13 }
+    ];
+
+    for (const l of module2) {
+        await Lesson.create({
+            courseId: osCourse._id,
+            title: l.title,
+            videoUrl: `https://www.youtube.com/embed/${l.id}`,
+            orderIndex: l.order,
+            moduleNumber: 2
+        });
+    }
+
+    // Module 2 Advance Exam
+    await Exam.create({
+        courseId: osCourse._id,
+        title: "Module 2: Process Control Quiz",
+        orderIndex: 2,
+        moduleNumber: 2,
+        questions: [
+            { text: "Which state follows 'Running' when a time slice expires?", options: ["Terminated", "Waiting", "Ready", "New"], correctOptionIndex: 2 },
+            { text: "What is stored in the Process Control Block?", options: ["Process ID & State", "User Password", "HTML Code", "Nothing"], correctOptionIndex: 0 }
         ]
     });
 
     return NextResponse.json({ 
         success: true, 
-        message: "Database seeded successfully with your playlist!",
-        coursesCreated: 2,
-        lessonsCreated: 2 + playlist.length,
-        examsCreated: 1
+        message: "Production OS Curriculum (Calicut University) Seeded Successfully!",
+        summary: {
+            course: osCourse.title,
+            lessons: module1.length + module2.length,
+            exams: 2
+        }
     });
 
   } catch (error: any) {

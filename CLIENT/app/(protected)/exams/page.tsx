@@ -19,6 +19,7 @@ import {
 import { useProgressStore } from "@/store/progressStore";
 import { useToast } from "@/lib/toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export default function ExamsPage() {
   const [exams, setExams] = useState<any[]>([]);
@@ -90,66 +91,69 @@ export default function ExamsPage() {
         <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#011c18] rounded-[3rem] p-10 md:p-14 text-white shadow-2xl relative overflow-hidden"
+            className="bg-[#011c18] rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
           <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
               <div>
-                  <h1 className="text-4xl font-black tracking-tighter mb-2">{activeExam.title}</h1>
-                  <p className="text-emerald-100/50 font-medium">Final Assessment • Module {activeExam.orderIndex}</p>
+                  <h1 className="text-2xl md:text-3xl font-black tracking-tighter mb-2">{activeExam.title}</h1>
+                  <p className="text-emerald-100/50 text-xs font-medium uppercase tracking-widest">Digital Phase-Gate Assessment</p>
               </div>
-              <div className="flex bg-white/5 border border-white/10 px-6 py-4 rounded-3xl backdrop-blur-md items-center gap-4">
-                  <div className="bg-emerald-500/20 p-2.5 rounded-full">
-                    <Timer size={24} className="text-emerald-400" />
+              <div className="flex bg-white/5 border border-white/10 px-5 py-3.5 rounded-2xl backdrop-blur-md items-center gap-4">
+                  <div className="bg-emerald-500/20 p-2 rounded-full">
+                    <Timer size={20} className="text-emerald-400" />
                   </div>
                   <div>
-                    <span className="block text-[10px] font-black uppercase tracking-widest text-emerald-100/40">Estimated Time</span>
-                    <span className="text-xl font-bold tracking-tight">15:00 Mins</span>
+                    <span className="block text-[8px] font-black uppercase tracking-widest text-emerald-100/40">Evaluation Duration</span>
+                    <span className="text-lg font-bold tracking-tight leading-none">15:00 Mins</span>
                   </div>
               </div>
           </div>
         </motion.div>
         
-        <div className="space-y-8">
-          {activeExam.questions.map((q: any, i: number) => (
-            <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                key={q.id}
-            >
-                <Card className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-500">
-                  <CardHeader className="p-10 pb-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600/50">Question {i + 1}</span>
-                        <HelpCircle size={18} className="text-gray-300" />
-                    </div>
-                    <CardTitle className="text-2xl font-black text-gray-900 tracking-tight leading-tight">{q.text}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="px-10 pb-10 space-y-3">
-                    {q.options.map((opt: string, optIdx: number) => (
-                      <div 
-                        key={optIdx}
-                        onClick={() => setAnswers({...answers, [q.id]: optIdx})}
-                        className={`group relative p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer flex items-center gap-4 overflow-hidden ${answers[q.id] === optIdx ? 'bg-emerald-50 border-emerald-500 shadow-lg shadow-emerald-900/5' : 'bg-gray-50/50 border-transparent hover:border-emerald-100 hover:bg-white'}`}
-                      >
-                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${answers[q.id] === optIdx ? 'bg-emerald-500 border-emerald-500 text-white scale-110' : 'border-gray-200 group-hover:border-emerald-200'}`}>
-                            {answers[q.id] === optIdx && <div className="w-2 h-2 rounded-full bg-white"></div>}
-                        </div>
-                        <span className={`text-[15px] font-bold ${answers[q.id] === optIdx ? 'text-emerald-900' : 'text-gray-500 group-hover:text-gray-800'}`}>
-                            {opt}
-                        </span>
-                        {answers[q.id] === optIdx && (
-                            <div className="absolute top-0 right-0 h-full w-12 bg-emerald-500/10 flex items-center justify-center">
-                                <CheckCircle2 size={16} className="text-emerald-600" />
-                            </div>
-                        )}
+        <div className="space-y-6">
+          {activeExam.questions.map((q: any, i: number) => {
+            const qId = q.id || q._id || i;
+            return (
+              <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  key={qId}
+              >
+                  <Card className="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-500">
+                    <CardHeader className="p-8 pb-4">
+                      <div className="flex items-center justify-between mb-4">
+                          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-600/50">Curriculum Point {i + 1}</span>
+                          <HelpCircle size={16} className="text-gray-300" />
                       </div>
-                    ))}
-                  </CardContent>
-                </Card>
-            </motion.div>
-          ))}
+                      <CardTitle className="text-xl md:text-2xl font-black text-gray-900 tracking-tight leading-tight">{q.text}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-8 pb-8 space-y-3">
+                      {q.options.map((opt: string, optIdx: number) => (
+                        <div 
+                          key={`${qId}-opt-${optIdx}`}
+                          onClick={() => setAnswers({...answers, [qId]: optIdx})}
+                          className={`group relative p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer flex items-center gap-4 overflow-hidden ${answers[qId] === optIdx ? 'bg-emerald-50 border-emerald-500 shadow-lg shadow-emerald-900/5' : 'bg-gray-50/50 border-transparent hover:border-emerald-100 hover:bg-white'}`}
+                        >
+                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${answers[qId] === optIdx ? 'bg-emerald-500 border-emerald-500 text-white scale-110' : 'border-gray-200 group-hover:border-emerald-200'}`}>
+                              {answers[qId] === optIdx && <div className="w-2 h-2 rounded-full bg-white"></div>}
+                          </div>
+                          <span className={`text-[15px] font-bold ${answers[qId] === optIdx ? 'text-emerald-900' : 'text-gray-500 group-hover:text-gray-800'}`}>
+                              {opt}
+                          </span>
+                          {answers[qId] === optIdx && (
+                              <div className="absolute top-0 right-0 h-full w-12 bg-emerald-500/10 flex items-center justify-center">
+                                  <CheckCircle2 size={16} className="text-emerald-600" />
+                              </div>
+                          )}
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+              </motion.div>
+            );
+          })}
         </div>
 
         <div className="flex flex-col md:flex-row justify-between items-center bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl gap-6">
@@ -181,8 +185,8 @@ export default function ExamsPage() {
                 <GraduationCap size={14} />
                 Knowledge Evaluation
             </div>
-            <h1 className="text-4xl font-black tracking-tighter text-gray-900">Examinations</h1>
-            <p className="text-gray-500 font-medium max-w-lg">
+            <h1 className="text-2xl md:text-4xl font-black tracking-tighter text-gray-900 leading-tight">Examinations</h1>
+            <p className="text-gray-500 font-medium text-xs md:text-base max-w-lg">
                 Complete your course modules to unlock advanced quizzes and certifications.
             </p>
         </div>
@@ -213,25 +217,40 @@ export default function ExamsPage() {
           </div>
         ) : (
           <AnimatePresence>
-            {exams.map((exam, idx) => (
+            {exams.map((exam, idx) => {
+              const isLocked = exam.isLocked;
+              return (
               <motion.div 
                 key={exam.id}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.1 }}
-                whileHover={{ y: -8 }}
+                whileHover={!isLocked ? { y: -8 } : {}}
               >
-                <Card className="flex flex-col h-full bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-900/10 transition-all duration-700 overflow-hidden relative group">
+                <Card className={cn(
+                    "flex flex-col h-full bg-white rounded-[2.5rem] border transition-all duration-700 overflow-hidden relative group",
+                    isLocked ? "border-gray-100 opacity-60 grayscale cursor-not-allowed" : "border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-900/10"
+                )}>
+                  {isLocked && (
+                    <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/5 backdrop-blur-[1px]">
+                        <div className="bg-white/80 p-4 rounded-full shadow-2xl border border-gray-100">
+                             <Lock className="h-8 w-8 text-gray-400" />
+                        </div>
+                    </div>
+                  )}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 group-hover:bg-emerald-500/10 transition-all duration-700"></div>
                   <CardHeader className="p-8 pb-4">
-                    <div className="bg-emerald-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-inner border border-emerald-100/50">
-                      <FileEdit className="h-6 w-6 text-emerald-600" strokeWidth={2.5} />
+                    <div className={cn(
+                        "w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform shadow-inner border",
+                        isLocked ? "bg-gray-100 border-gray-200" : "bg-emerald-50 border-emerald-100/50 group-hover:scale-110"
+                    )}>
+                      {isLocked ? <Lock className="h-6 w-6 text-gray-300" /> : <FileEdit className="h-6 w-6 text-emerald-600" strokeWidth={2.5} />}
                     </div>
                     <CardTitle className="text-2xl font-black text-gray-900 tracking-tight leading-tight mb-2">{exam.title}</CardTitle>
                     <div className="flex items-center gap-2">
                          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600/50">Module {exam.orderIndex}</span>
                          <div className="w-1 h-1 rounded-full bg-gray-200"></div>
-                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Digital Quiz</span>
+                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{isLocked ? 'Locked' : 'Available'} Assessment</span>
                     </div>
                   </CardHeader>
                   <CardContent className="p-8 pt-0 flex-1">
@@ -247,16 +266,22 @@ export default function ExamsPage() {
                   </CardContent>
                   <CardFooter className="p-8 pt-0">
                     <Button 
-                        className="w-full h-14 rounded-2xl bg-emerald-600 hover:bg-[#011c18] text-white font-black shadow-lg shadow-emerald-500/10 group-hover:shadow-emerald-500/20 transition-all flex gap-3"
+                        disabled={isLocked}
+                        className={cn(
+                            "w-full h-14 rounded-2xl font-black shadow-lg transition-all flex gap-3",
+                            isLocked 
+                                ? "bg-gray-100 text-gray-400 border-gray-200" 
+                                : "bg-emerald-600 hover:bg-[#011c18] text-white shadow-emerald-500/10 group-hover:shadow-emerald-500/20"
+                        )}
                         onClick={() => setActiveExam(exam)}
                     >
-                        Initiate Assessment
-                        <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        {isLocked ? 'Access Restricted' : 'Initiate Assessment'}
+                        {!isLocked && <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />}
                     </Button>
                   </CardFooter>
                 </Card>
               </motion.div>
-            ))}
+            )})}
             
             {/* Visual locked placeholder */}
             <div className="bg-gray-50/30 rounded-[2.5rem] border border-dashed border-gray-200 p-8 flex flex-col justify-center items-center text-center opacity-60 grayscale scale-95 pointer-events-none">

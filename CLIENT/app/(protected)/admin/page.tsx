@@ -77,6 +77,20 @@ export default function AdminDashboardPage() {
             </Button>
           </CardContent>
         </Card>
+
+        <Card className="border-emerald-200 bg-emerald-50/10">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-emerald-900 text-lg flex items-center gap-2">
+              <UserCheck className="h-5 w-5 text-emerald-600" /> Performance Tracking
+            </CardTitle>
+            <CardDescription>View detailed student progress</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild className="mt-4 bg-emerald-600 hover:bg-emerald-700" variant="default">
+              <Link href="/admin/progress">View Student Progress</Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
