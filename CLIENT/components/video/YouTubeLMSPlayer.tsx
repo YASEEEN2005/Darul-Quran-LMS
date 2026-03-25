@@ -252,7 +252,7 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
       ref={containerRef}
       className="relative w-full aspect-video bg-black overflow-hidden group"
     >
-      <div id={`youtube-player-${videoId}`} className="absolute inset-0 w-full h-full pointer-events-none scale-[1.35] translate-y-[-2%]"></div>
+      <div id={`youtube-player-${videoId}`} className="absolute inset-0 w-full h-full pointer-events-none"></div>
       
       {/* Premium Cover Overlay - ONLY show before first play or after reset */}
       {!hasStarted && (

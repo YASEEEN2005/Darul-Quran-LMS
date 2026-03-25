@@ -47,10 +47,10 @@ export default function ClassesPage() {
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [activeItemId, setActiveItemId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentDuration, setCurrentDuration] = useState<number>(0);
-  
+  const [activeModule, setActiveModule] = useState<number>(1);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentDuration, setCurrentDuration] = useState(0);
   
   const { markLessonComplete } = useProgressStore();
   const { toast } = useToast();
@@ -147,6 +147,15 @@ export default function ClassesPage() {
 
         if (selectedCourse) fetchCurriculum(selectedCourse);
         setAnswers({});
+
+        // If passed, we can automatically help the user navigate to next module
+        if (passed) {
+            const nextModuleNum = (activeItem.moduleNumber || activeModule) + 1;
+            const hasNextModule = curriculum.some(i => i.moduleNumber === nextModuleNum);
+            if (hasNextModule) {
+               setActiveModule(nextModuleNum);
+            }
+        }
     } catch (e) {
         toast({ variant: "destructive", title: "Assessment Error", description: "Submission failed." });
     } finally {
@@ -450,11 +459,38 @@ export default function ClassesPage() {
 
         {/* Sidebar Curriculum */}
         <div className="lg:col-span-4 space-y-6">
-            <div className="flex items-center justify-between px-2">
-                <h3 className="text-lg font-black text-gray-900 tracking-tighter">Academic Path</h3>
-                <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
-                    {curriculum.filter(i => i.isCompleted).length} / {curriculum.length} DONE
-                </span>
+            <div className="flex flex-col gap-5 px-2">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-black text-gray-900 tracking-tighter">Academic Path</h3>
+                    <div className="flex bg-gray-100 p-1 rounded-xl">
+                        {[1, 2].map(m => {
+                            const isModuleLocked = m > 1 && !curriculum.some(i => i.moduleNumber === m-1 && i.type === 'EXAM' && i.isCompleted);
+                            return (
+                                <button 
+                                    key={m}
+                                    onClick={() => !isModuleLocked && setActiveModule(m)}
+                                    className={cn(
+                                        "px-4 py-1.5 rounded-lg text-[10px] font-black transition-all",
+                                        activeModule === m ? "bg-white text-emerald-800 shadow-sm" : "text-gray-400 cursor-pointer hover:text-gray-600",
+                                        isModuleLocked && "opacity-30 cursor-not-allowed grayscale"
+                                    )}
+                                >
+                                    MOD {m}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+                
+                <div className="bg-emerald-50/50 border border-emerald-100/50 rounded-2xl p-4 flex items-center justify-between">
+                    <div>
+                        <span className="text-[10px] font-black text-emerald-700/60 uppercase tracking-[0.2em] block mb-0.5">Focus Area</span>
+                        <span className="text-xs font-black text-emerald-900">Module {activeModule}: {activeModule === 1 ? 'OS Fundamentals' : 'Process Control'}</span>
+                    </div>
+                    <div className="px-3 py-1 bg-white rounded-full text-[10px] font-black text-emerald-600 border border-emerald-100 shadow-sm">
+                        {curriculum.filter(i => i.moduleNumber === activeModule && i.isCompleted).length} / {curriculum.filter(i => i.moduleNumber === activeModule).length}
+                    </div>
+                </div>
             </div>
             
             <div className="space-y-3 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
@@ -468,7 +504,9 @@ export default function ClassesPage() {
                         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">No Curriculum Found</p>
                     </div>
                 ) : (
-                    curriculum.map((item) => {
+                    curriculum
+                      .filter(item => item.moduleNumber === activeModule || (!item.moduleNumber && activeModule === 1))
+                      .map((item) => {
                         const isActive = activeItemId === item.id;
                         return (
                             <motion.div 
@@ -505,6 +543,7 @@ export default function ClassesPage() {
                                             <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600/60">
                                                 {item.type === 'EXAM' ? 'PHASE-GATE' : `UNIT ${item.orderIndex}`}
                                             </span>
+                                            {item.isCompleted && <span className="text-[8px] font-black text-green-600 px-1.5 py-0.5 rounded uppercase tracking-tighter">Completed</span>}
                                             {item.isLocked && <span className="text-[8px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded uppercase tracking-tighter">Locked</span>}
                                         </div>
                                     </div>
@@ -513,6 +552,16 @@ export default function ClassesPage() {
                         );
                     })
                 )}
+            </div>
+            
+            <div className="mt-4 p-5 bg-amber-50 rounded-3xl border border-amber-100/50">
+                <div className="flex items-center gap-2 mb-2 text-amber-800">
+                    <AlertCircle size={14} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Requirement</span>
+                </div>
+                <p className="text-[11px] text-amber-900/60 font-medium leading-relaxed">
+                    Complete all units and pass the assessment with 70% to unlock Module {activeModule + 1}.
+                </p>
             </div>
         </div>
 
