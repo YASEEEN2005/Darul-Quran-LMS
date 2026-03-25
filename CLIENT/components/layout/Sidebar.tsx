@@ -37,6 +37,7 @@ export function Sidebar({ className }: { className?: string }) {
   const adminLinks = [
     { name: "Admin Home", href: "/admin", icon: ShieldAlert },
     { name: "Student Roster", href: "/admin/users", icon: Users },
+    { name: "Performance Track", href: "/admin/progress", icon: CheckSquare },
     { name: "Curriculum", href: "/admin/courses", icon: BookOpen },
     { name: "Content Manager", href: "/admin/lessons", icon: MonitorPlay },
     { name: "Exam Manager", href: "/admin/exams", icon: CheckSquare },

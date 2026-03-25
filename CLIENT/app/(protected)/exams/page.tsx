@@ -111,45 +111,48 @@ export default function ExamsPage() {
         </motion.div>
         
         <div className="space-y-8">
-          {activeExam.questions.map((q: any, i: number) => (
-            <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                key={q.id}
-            >
-                <Card className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-500">
-                  <CardHeader className="p-10 pb-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600/50">Question {i + 1}</span>
-                        <HelpCircle size={18} className="text-gray-300" />
-                    </div>
-                    <CardTitle className="text-2xl font-black text-gray-900 tracking-tight leading-tight">{q.text}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="px-10 pb-10 space-y-3">
-                    {q.options.map((opt: string, optIdx: number) => (
-                      <div 
-                        key={optIdx}
-                        onClick={() => setAnswers({...answers, [q.id]: optIdx})}
-                        className={`group relative p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer flex items-center gap-4 overflow-hidden ${answers[q.id] === optIdx ? 'bg-emerald-50 border-emerald-500 shadow-lg shadow-emerald-900/5' : 'bg-gray-50/50 border-transparent hover:border-emerald-100 hover:bg-white'}`}
-                      >
-                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${answers[q.id] === optIdx ? 'bg-emerald-500 border-emerald-500 text-white scale-110' : 'border-gray-200 group-hover:border-emerald-200'}`}>
-                            {answers[q.id] === optIdx && <div className="w-2 h-2 rounded-full bg-white"></div>}
-                        </div>
-                        <span className={`text-[15px] font-bold ${answers[q.id] === optIdx ? 'text-emerald-900' : 'text-gray-500 group-hover:text-gray-800'}`}>
-                            {opt}
-                        </span>
-                        {answers[q.id] === optIdx && (
-                            <div className="absolute top-0 right-0 h-full w-12 bg-emerald-500/10 flex items-center justify-center">
-                                <CheckCircle2 size={16} className="text-emerald-600" />
-                            </div>
-                        )}
+          {activeExam.questions.map((q: any, i: number) => {
+            const qId = q.id || q._id || i;
+            return (
+              <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  key={qId}
+              >
+                  <Card className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-500">
+                    <CardHeader className="p-10 pb-6">
+                      <div className="flex items-center justify-between mb-4">
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600/50">Question {i + 1}</span>
+                          <HelpCircle size={18} className="text-gray-300" />
                       </div>
-                    ))}
-                  </CardContent>
-                </Card>
-            </motion.div>
-          ))}
+                      <CardTitle className="text-2xl font-black text-gray-900 tracking-tight leading-tight">{q.text}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-10 pb-10 space-y-3">
+                      {q.options.map((opt: string, optIdx: number) => (
+                        <div 
+                          key={`${qId}-opt-${optIdx}`}
+                          onClick={() => setAnswers({...answers, [qId]: optIdx})}
+                          className={`group relative p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer flex items-center gap-4 overflow-hidden ${answers[qId] === optIdx ? 'bg-emerald-50 border-emerald-500 shadow-lg shadow-emerald-900/5' : 'bg-gray-50/50 border-transparent hover:border-emerald-100 hover:bg-white'}`}
+                        >
+                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${answers[qId] === optIdx ? 'bg-emerald-500 border-emerald-500 text-white scale-110' : 'border-gray-200 group-hover:border-emerald-200'}`}>
+                              {answers[qId] === optIdx && <div className="w-2 h-2 rounded-full bg-white"></div>}
+                          </div>
+                          <span className={`text-[15px] font-bold ${answers[qId] === optIdx ? 'text-emerald-900' : 'text-gray-500 group-hover:text-gray-800'}`}>
+                              {opt}
+                          </span>
+                          {answers[qId] === optIdx && (
+                              <div className="absolute top-0 right-0 h-full w-12 bg-emerald-500/10 flex items-center justify-center">
+                                  <CheckCircle2 size={16} className="text-emerald-600" />
+                              </div>
+                          )}
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+              </motion.div>
+            );
+          })}
         </div>
 
         <div className="flex flex-col md:flex-row justify-between items-center bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl gap-6">
