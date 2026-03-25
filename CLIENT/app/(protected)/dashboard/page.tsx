@@ -59,14 +59,14 @@ export default function DashboardPage() {
       <motion.div 
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative group h-[300px] md:h-[350px] w-full bg-[#011c18] rounded-[3rem] overflow-hidden flex items-center shadow-2xl transition-all duration-700 hover:shadow-emerald-900/10"
+        className="relative group min-h-[300px] md:min-h-[350px] py-12 w-full bg-[#011c18] rounded-[2.5rem] overflow-hidden flex items-center shadow-2xl transition-all duration-700 hover:shadow-emerald-900/10"
       >
         <div className="absolute inset-0 z-0 overflow-hidden">
             <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[150%] bg-linear-to-br from-emerald-500/20 via-teal-500/5 to-transparent rounded-full blur-[120px] animate-pulse"></div>
             <div className="absolute bottom-[-10%] left-[5%] w-[40%] h-[80%] bg-emerald-900/20 rounded-full blur-[100px]"></div>
         </div>
 
-        <div className="relative z-10 px-10 md:px-16 w-full flex flex-col md:flex-row justify-between items-center gap-10">
+        <div className="relative z-10 px-10 md:px-10 w-full flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="max-w-xl text-center md:text-left">
             <motion.div 
                 initial={{ opacity: 0, x: -20 }}

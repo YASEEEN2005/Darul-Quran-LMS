@@ -90,27 +90,27 @@ export default function ExamsPage() {
         <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#011c18] rounded-[3rem] p-10 md:p-14 text-white shadow-2xl relative overflow-hidden"
+            className="bg-[#011c18] rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
           <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
               <div>
-                  <h1 className="text-4xl font-black tracking-tighter mb-2">{activeExam.title}</h1>
-                  <p className="text-emerald-100/50 font-medium">Final Assessment • Module {activeExam.orderIndex}</p>
+                  <h1 className="text-2xl md:text-3xl font-black tracking-tighter mb-2">{activeExam.title}</h1>
+                  <p className="text-emerald-100/50 text-xs font-medium uppercase tracking-widest">Digital Phase-Gate Assessment</p>
               </div>
-              <div className="flex bg-white/5 border border-white/10 px-6 py-4 rounded-3xl backdrop-blur-md items-center gap-4">
-                  <div className="bg-emerald-500/20 p-2.5 rounded-full">
-                    <Timer size={24} className="text-emerald-400" />
+              <div className="flex bg-white/5 border border-white/10 px-5 py-3.5 rounded-2xl backdrop-blur-md items-center gap-4">
+                  <div className="bg-emerald-500/20 p-2 rounded-full">
+                    <Timer size={20} className="text-emerald-400" />
                   </div>
                   <div>
-                    <span className="block text-[10px] font-black uppercase tracking-widest text-emerald-100/40">Estimated Time</span>
-                    <span className="text-xl font-bold tracking-tight">15:00 Mins</span>
+                    <span className="block text-[8px] font-black uppercase tracking-widest text-emerald-100/40">Evaluation Duration</span>
+                    <span className="text-lg font-bold tracking-tight leading-none">15:00 Mins</span>
                   </div>
               </div>
           </div>
         </motion.div>
         
-        <div className="space-y-8">
+        <div className="space-y-6">
           {activeExam.questions.map((q: any, i: number) => {
             const qId = q.id || q._id || i;
             return (
@@ -120,15 +120,15 @@ export default function ExamsPage() {
                   transition={{ delay: i * 0.1 }}
                   key={qId}
               >
-                  <Card className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-500">
-                    <CardHeader className="p-10 pb-6">
+                  <Card className="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-500">
+                    <CardHeader className="p-8 pb-4">
                       <div className="flex items-center justify-between mb-4">
-                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600/50">Question {i + 1}</span>
-                          <HelpCircle size={18} className="text-gray-300" />
+                          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-600/50">Curriculum Point {i + 1}</span>
+                          <HelpCircle size={16} className="text-gray-300" />
                       </div>
-                      <CardTitle className="text-2xl font-black text-gray-900 tracking-tight leading-tight">{q.text}</CardTitle>
+                      <CardTitle className="text-xl md:text-2xl font-black text-gray-900 tracking-tight leading-tight">{q.text}</CardTitle>
                     </CardHeader>
-                    <CardContent className="px-10 pb-10 space-y-3">
+                    <CardContent className="px-8 pb-8 space-y-3">
                       {q.options.map((opt: string, optIdx: number) => (
                         <div 
                           key={`${qId}-opt-${optIdx}`}

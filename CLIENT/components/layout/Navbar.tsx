@@ -63,7 +63,7 @@ export function Navbar() {
 
   return (
     <>
-      <header className="flex h-24 items-center justify-between px-6 md:px-10 bg-white border-b border-gray-100 w-full z-40 shrink-0 sticky top-0 transition-all duration-300">
+      <header className="flex h-20 items-center justify-between px-6 md:px-10 bg-white border-b border-gray-100 w-full z-40 shrink-0 sticky top-0 transition-all duration-300">
         
         {/* Mobile Hamburger + Title */}
         <div className="flex items-center gap-4">

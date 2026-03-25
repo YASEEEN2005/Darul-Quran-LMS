@@ -261,13 +261,13 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
                 </div>
             </div>
             
-            <div className="absolute top-8 left-8 flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center">
-                    <Settings className="text-white/60 animate-spin-slow" size={20} />
+            <div className="absolute top-6 left-6 flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center">
+                    <Settings className="text-white/60 animate-spin-slow" size={14} />
                 </div>
-                <div className="space-y-1">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">Secure Session</span>
-                    <h4 className="text-white font-bold leading-none">{title}</h4>
+                <div className="space-y-0">
+                    <span className="text-[8px] font-black uppercase tracking-[0.2em] text-emerald-400">Secure Protocol</span>
+                    <h4 className="text-white text-xs font-bold leading-none">{title}</h4>
                 </div>
             </div>
         </div>
@@ -291,23 +291,23 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
                     exit={{ opacity: 0 }}
                     key={skipIndicator}
                     className={cn(
-                        "absolute top-1/2 -translate-y-1/2 flex flex-col items-center justify-center p-14 bg-black/40 rounded-full backdrop-blur-md z-30 transition-all text-white",
-                        skipIndicator === 'forward' ? 'right-24' : 'left-24'
+                        "absolute top-1/2 -translate-y-1/2 flex flex-col items-center justify-center p-8 bg-black/60 rounded-full backdrop-blur-xl z-30 transition-all text-white",
+                        skipIndicator === 'forward' ? 'right-12 md:right-24' : 'left-12 md:left-24'
                     )}
                 >
-                    <div className="flex flex-col items-center gap-1">
-                        <div className="flex -space-x-4">
+                    <div className="flex flex-col items-center gap-0.5">
+                        <div className="flex -space-x-2">
                             {[0, 1, 2].map(i => (
                                 <motion.div 
                                     key={i}
                                     animate={{ opacity: [0.2, 1, 0.2] }} 
                                     transition={{ repeat: Infinity, duration: 0.6, delay: i * 0.1 }}
                                 >
-                                    <RotateCcw size={32} className={skipIndicator === 'forward' ? "rotate-180" : ""} />
+                                    <RotateCcw size={24} className={skipIndicator === 'forward' ? "rotate-180" : ""} />
                                 </motion.div>
                             ))}
                         </div>
-                        <span className="text-xl font-black mt-2 tracking-tighter">10 SECONDS</span>
+                        <span className="text-[10px] font-black mt-1 tracking-widest uppercase">10s</span>
                     </div>
                 </motion.div>
             )}
@@ -351,10 +351,10 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
                  </div>
                  
                  <button onClick={toggleFullscreen} className="hover:text-emerald-400 transition-colors mr-2">
-                    <Maximize size={20} />
+                    <Maximize size={18} />
                  </button>
-                 <span className="hidden sm:inline-block text-[10px] font-black tracking-widest uppercase text-emerald-400 border border-emerald-400/30 px-2 py-1 rounded">Secure Session</span>
-                 <div className="w-32 h-8 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 text-[10px] font-black tracking-widest uppercase">Darul-Quran</div>
+                 <span className="hidden lg:inline-block text-[8px] font-black tracking-widest uppercase text-emerald-400 border border-emerald-400/30 px-2 py-0.5 rounded">Encrypted</span>
+                 <div className="hidden md:flex w-24 h-7 bg-white/5 rounded-lg items-center justify-center border border-white/10 text-[8px] font-black tracking-widest uppercase">Darul-Quran</div>
             </div>
           </div>
         </div>

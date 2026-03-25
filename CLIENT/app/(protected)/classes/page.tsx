@@ -193,26 +193,27 @@ export default function ClassesPage() {
   };
 
   return (
-    <div className="space-y-10 max-w-[1400px] mx-auto pb-20">
+    <div className="max-w-[1600px] mx-auto pb-20 px-4 md:px-8 space-y-8">
       
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4 md:px-0">
-        <div className="space-y-2">
-            <div className="flex items-center gap-2 text-emerald-600 font-black uppercase tracking-[0.2em] text-[10px]">
-                <BookOpen size={14} />
-                University Curriculum
+      {/* Dynamic Header Section */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pt-8 md:pt-12 border-b border-gray-100 pb-10">
+        <div className="space-y-3">
+            <div className="flex items-center gap-2 text-emerald-600 font-black uppercase tracking-[0.25em] text-[10px] md:text-xs">
+                <GraduationCap size={16} />
+                LMS Environment
             </div>
-            <h1 className="text-4xl font-black tracking-tighter text-gray-900">Virtual Classroom</h1>
-            <p className="text-gray-500 font-medium max-w-lg">
-                Engage with premium scholarship through structured video modules.
+            <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-gray-900 leading-[0.9]">Virtual Classroom</h1>
+            <p className="text-gray-500 font-medium text-sm md:text-base max-w-xl">
+                Engage with immersive university-standard scholarship through our modular academic framework.
             </p>
         </div>
         
-        <div className="flex bg-gray-100/50 p-1.5 rounded-[1.5rem] border border-gray-100 overflow-x-auto scrollbar-hide max-w-full">
+        <div className="flex bg-gray-50 p-1.5 rounded-2xl border border-gray-100 overflow-x-auto scrollbar-hide">
             {courses.map(course => (
                 <button 
                     key={course.id}
                     onClick={() => { setSelectedCourse(course.id); setActiveItemId(null); }}
-                    className={`whitespace-nowrap px-6 py-3 rounded-2xl text-[13px] font-black transition-all duration-300 ${selectedCourse === course.id ? 'bg-white text-emerald-700 shadow-xl shadow-emerald-900/5' : 'text-gray-400 hover:text-gray-600 cursor-pointer'}`}
+                    className={`whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-400 ${selectedCourse === course.id ? 'bg-white text-emerald-800 shadow-xl shadow-emerald-900/5' : 'text-gray-400 hover:text-gray-600 cursor-pointer'}`}
                 >
                     {course.title}
                 </button>
@@ -220,15 +221,16 @@ export default function ClassesPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-start">
         
-        <div className="xl:col-span-2 space-y-8">
+        {/* Main Instruction Area */}
+        <div className="lg:col-span-8 space-y-8">
             <motion.div 
                 layoutId="player"
-                className="min-h-[400px] aspect-video bg-[#011c18] rounded-[3rem] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] border border-white/5 relative group"
+                className="w-full aspect-video bg-black rounded-3xl md:rounded-[2.5rem] overflow-hidden shadow-2xl shadow-emerald-900/10 border border-gray-100 relative group"
             >
                 {activeItem?.type === 'LESSON' ? (
-                    <div className="relative w-full h-full overflow-hidden scale-[1.01]">
+                    <div className="relative w-full h-full overflow-hidden">
                         <YouTubeLMSPlayer 
                             videoId={getYouTubeId(activeItem.videoUrl || "") || ""} 
                             onComplete={handleVideoComplete}
@@ -237,48 +239,48 @@ export default function ClassesPage() {
                         />
                     </div>
                 ) : activeItem?.type === 'EXAM' ? (
-                    <div className="w-full h-full p-10 md:p-16 flex flex-col text-white overflow-y-auto">
-                        <div className="flex justify-between items-start mb-12">
+                    <div className="w-full h-full p-6 md:p-12 lg:p-16 flex flex-col bg-[#011c18] text-white overflow-y-auto custom-scrollbar">
+                        <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-10 md:mb-16">
                             <div>
-                                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400 mb-2">Internal Assessment</h3>
-                                <h2 className="text-4xl font-black tracking-tighter leading-none">{activeItem.title}</h2>
-                                <p className="text-emerald-100/40 text-sm mt-3 font-medium">Score 70% or more to unlock Module {activeItem.orderIndex + 1}</p>
+                                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400 mb-2">Phase Assessment</h3>
+                                <h2 className="text-2xl md:text-4xl font-black tracking-tighter leading-none">{activeItem.title}</h2>
+                                <p className="text-emerald-100/40 text-xs md:text-sm mt-3 font-medium">Requirement: 70% Score to Advance</p>
                             </div>
-                            <div className="bg-white/5 border border-white/10 px-6 py-4 rounded-3xl backdrop-blur-md flex items-center gap-4">
-                                <div className="bg-emerald-500/20 p-2.5 rounded-full"><Timer size={24} className="text-emerald-400" /></div>
+                            <div className="w-full md:w-auto bg-white/5 border border-white/10 px-5 py-3 rounded-2xl backdrop-blur-md flex items-center gap-4">
+                                <div className="bg-emerald-500/20 p-2 rounded-full"><Timer size={20} className="text-emerald-400" /></div>
                                 <div>
-                                    <span className="block text-[10px] font-black uppercase tracking-widest text-emerald-100/40">Evaluation</span>
-                                    <span className="text-xl font-bold tracking-tight">Required</span>
+                                    <span className="block text-[8px] font-black uppercase tracking-widest text-emerald-100/40">Evaluation Mode</span>
+                                    <span className="text-sm md:text-base font-bold tracking-tight">Active</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="space-y-12">
+                        <div className="space-y-10">
                             {activeItem.questions?.map((q: any, i: number) => (
-                                <div key={i} className="space-y-6">
-                                    <h4 className="text-xl font-bold text-emerald-50 flex gap-4">
-                                        <span className="opacity-20 font-black italic">#{i+1}</span>
+                                <div key={i} className="space-y-5">
+                                    <h4 className="text-lg md:text-xl font-bold text-gray-50 flex gap-3">
+                                        <span className="opacity-30 font-black italic text-emerald-500">#{i+1}</span>
                                         {q.text}
                                     </h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         {q.options.map((opt: string, optIdx: number) => (
                                             <div 
                                                 key={optIdx}
                                                 onClick={() => setAnswers({ ...answers, [i]: optIdx })}
                                                 className={cn(
-                                                    "p-6 rounded-2xl border transition-all cursor-pointer flex items-center gap-4",
+                                                    "p-5 rounded-xl border transition-all cursor-pointer flex items-center gap-4",
                                                     answers[i] === optIdx 
-                                                        ? "bg-emerald-500 border-emerald-400 shadow-lg shadow-emerald-500/20" 
+                                                        ? "bg-emerald-500 border-emerald-400 shadow-xl shadow-emerald-500/10" 
                                                         : "bg-white/5 border-white/10 hover:bg-white/10"
                                                 )}
                                             >
                                                 <div className={cn(
-                                                    "w-6 h-6 rounded-full border-2 flex items-center justify-center",
+                                                    "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0",
                                                     answers[i] === optIdx ? "bg-white border-white" : "border-white/20"
                                                 )}>
-                                                    {answers[i] === optIdx && <div className="w-2 h-2 rounded-full bg-emerald-500" />}
+                                                    {answers[i] === optIdx && <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
                                                 </div>
-                                                <span className={cn("text-sm font-bold", answers[i] === optIdx ? "text-[#011c18]" : "text-emerald-50/60")}>
+                                                <span className={cn("text-xs md:text-sm font-bold", answers[i] === optIdx ? "text-[#011c18]" : "text-emerald-50/60")}>
                                                     {opt}
                                                 </span>
                                             </div>
@@ -288,92 +290,95 @@ export default function ClassesPage() {
                             ))}
                         </div>
 
-                        <div className="mt-16 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
-                            <div className="flex items-center gap-3 text-emerald-100/40">
-                                <AlertCircle size={20} />
-                                <p className="text-sm font-medium">Verify your selections. You must pass to proceed to the next module.</p>
+                        <div className="mt-12 md:mt-20 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-6">
+                            <div className="flex items-center gap-3 text-emerald-100/30 text-center sm:text-left">
+                                <AlertCircle size={18} />
+                                <p className="text-[11px] font-medium leading-tight">By submitting, you confirm these are your original responses.</p>
                             </div>
                             <Button 
                                 onClick={handleSubmitExam}
                                 disabled={isSubmitting || Object.keys(answers).length < (activeItem.questions?.length || 0)}
-                                className="h-16 px-12 rounded-[2rem] bg-emerald-500 hover:bg-emerald-400 text-[#011c18] font-black text-lg shadow-2xl shadow-emerald-500/20 transition-all flex gap-3"
+                                className="w-full sm:w-auto h-14 px-10 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-[#011c18] font-black shadow-2xl shadow-emerald-500/20 transition-all flex gap-3"
                             >
-                                {isSubmitting ? "Evaluating..." : "Complete Assessment"}
-                                <ChevronRight size={20} />
+                                {isSubmitting ? "Processing..." : "Submit Assessment"}
+                                <ChevronRight size={18} />
                             </Button>
                         </div>
                     </div>
                 ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-center p-12 space-y-4">
-                        <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500/30">
-                            <PlayCircle size={48} strokeWidth={1} />
+                        <div className="w-16 h-16 rounded-3xl bg-emerald-50 relative overflow-hidden group-hover:scale-110 transition-transform">
+                            <div className="absolute inset-0 bg-emerald-500/10 animate-pulse" />
+                            <div className="relative w-full h-full flex items-center justify-center text-emerald-500">
+                                <PlayCircle size={32} strokeWidth={1.5} />
+                            </div>
                         </div>
-                        <h3 className="text-xl font-bold text-white/40">Select curriculum item to begin</h3>
+                        <h3 className="text-lg font-bold text-gray-400">Select a unit to begin learning</h3>
                     </div>
                 )}
             </motion.div>
 
+            {/* Content Details Mobile Toggle / Header */}
             <AnimatePresence mode="wait">
                 <motion.div 
                     key={activeItemId}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="bg-white rounded-[2.5rem] p-8 md:p-10 border border-gray-100 shadow-sm"
+                    className="bg-white rounded-3xl p-6 md:p-10 border border-gray-100 shadow-sm"
                 >
-                    <div className="flex flex-col md:flex-row justify-between gap-8">
+                    <div className="flex flex-col lg:flex-row justify-between gap-10">
                         <div className="flex-1 space-y-6">
-                            <div className="flex items-center gap-3">
-                                <span className="px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-100">
-                                    {activeItem?.type === 'EXAM' ? 'Module Assessment' : `Module ${activeItem?.orderIndex || 1}`}
+                            <div className="flex flex-wrap items-center gap-3">
+                                <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-[9px] font-black uppercase tracking-widest border border-emerald-100">
+                                    {activeItem?.type === 'EXAM' ? 'Internal Assessment' : `Academic Module ${activeItem?.orderIndex || 1}`}
                                 </span>
                                 {activeItem?.isCompleted && (
-                                    <span className="px-4 py-1.5 bg-green-50 text-green-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-green-100 flex items-center gap-1.5">
-                                        <CheckCircle2 size={12} />
-                                        Completed
+                                    <span className="px-3 py-1 bg-green-50 text-green-700 rounded-lg text-[9px] font-black uppercase tracking-widest border border-green-100 flex items-center gap-1.5">
+                                        <CheckCircle2 size={10} />
+                                        Certified
                                     </span>
                                 )}
                                 {activeItem?.type === 'LESSON' && (
-                                    <div className="flex items-center gap-1.5 text-gray-400 font-bold text-xs uppercase tracking-widest">
-                                        <Clock size={12} />
-                                        {currentDuration > 0 ? `${Math.floor(currentDuration / 60)}:${Math.floor(currentDuration % 60).toString().padStart(2, '0')}` : "Calculating..."} Duration
+                                    <div className="flex items-center gap-1.5 text-gray-400 font-bold text-[9px] uppercase tracking-widest">
+                                        <Clock size={10} />
+                                        {currentDuration > 0 ? `${Math.floor(currentDuration / 60)}:${Math.floor(currentDuration % 60).toString().padStart(2, '0')}` : "Reading"}
                                     </div>
                                 )}
                             </div>
-                            <h2 className="text-3xl font-black text-gray-900 tracking-tight leading-tight">
-                                {activeItem?.title || "Choose curriculum item"}
+                            <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter leading-tight">
+                                {activeItem?.title || "Classroom Empty"}
                             </h2>
-                            <p className="text-gray-500 text-lg leading-relaxed font-medium">
-                                {courses.find(c => c.id === selectedCourse)?.description || "Complete this section with focus to advance in your academic journey."}
+                            <p className="text-gray-500 text-base md:text-lg leading-relaxed font-medium">
+                                {courses.find(c => c.id === selectedCourse)?.description || "Complete this phase with focused attention to unlock the next instructional module."}
                             </p>
-                            <div className="flex flex-wrap gap-4 pt-4">
+                            <div className="flex flex-wrap gap-3 pt-2">
                                 <Button 
                                     onClick={handleDownloadNotes}
-                                    variant="outline" className="h-12 rounded-xl border-gray-100 px-6 font-bold text-gray-700 hover:bg-gray-50 flex gap-2"
+                                    variant="outline" className="h-11 rounded-xl border-gray-100 px-5 font-bold text-xs text-gray-600 hover:bg-gray-50 flex gap-2"
                                 >
-                                    <FileText size={18} className="text-emerald-600" />
-                                    Phase Guide (PDF)
+                                    <FileText size={16} className="text-emerald-600" />
+                                    Phase Notes
                                 </Button>
                                 <Button 
                                     onClick={handleShareProgress}
-                                    variant="outline" className="h-12 rounded-xl border-gray-100 px-6 font-bold text-gray-700 hover:bg-gray-50 flex gap-2"
+                                    variant="outline" className="h-11 rounded-xl border-gray-100 px-5 font-bold text-xs text-gray-600 hover:bg-gray-50 flex gap-2"
                                 >
-                                    <Share2 size={18} className="text-emerald-600" />
-                                    Share Progress
+                                    <Share2 size={16} className="text-emerald-600" />
+                                    Share Milestone
                                 </Button>
                             </div>
                         </div>
 
-                        <div className="w-full md:w-64 space-y-6">
-                            <div className="p-6 bg-emerald-50 rounded-[2rem] border border-emerald-100/50">
+                        <div className="w-full lg:w-72">
+                            <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100">
                                 <div className="flex items-center gap-2 mb-4">
-                                    <Info className="text-emerald-600" size={18} />
-                                    <span className="text-xs font-black uppercase tracking-widest text-emerald-700">Gating Policy</span>
+                                    <Info className="text-emerald-600" size={16} />
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-800">Phase Gating</span>
                                 </div>
-                                <p className="text-[13px] text-emerald-900/60 font-medium leading-relaxed">
+                                <p className="text-[12px] text-gray-500 font-medium leading-relaxed">
                                     {activeItem?.type === 'EXAM' 
-                                        ? "You must achieve a minimum of 70% to unlock the next instructional module. Results are recorded permanently." 
-                                        : "Engaging with this session fully is required to qualify for the phase-gate examination."}
+                                        ? "A score of 70% or higher is mandatory for curriculum progression." 
+                                        : "Full engagement with this unit is required to qualify for the phase assessment."}
                                 </p>
                             </div>
                         </div>
@@ -382,16 +387,24 @@ export default function ClassesPage() {
             </AnimatePresence>
         </div>
 
-        <div className="space-y-6">
-            <h3 className="text-xl font-black text-gray-900 px-2 tracking-tight">Curriculum Breakdown</h3>
-            <div className="space-y-3">
+        {/* Sidebar Curriculum */}
+        <div className="lg:col-span-4 space-y-6">
+            <div className="flex items-center justify-between px-2">
+                <h3 className="text-lg font-black text-gray-900 tracking-tighter">Academic Path</h3>
+                <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                    {curriculum.filter(i => i.isCompleted).length} / {curriculum.length} DONE
+                </span>
+            </div>
+            
+            <div className="space-y-3 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
                 {isLoading ? (
-                    [1,2,3,4].map(i => (
-                        <div key={i} className="h-24 w-full bg-gray-100 rounded-3xl animate-pulse"></div>
+                    [1,2,3,4,5].map(i => (
+                        <div key={i} className="h-24 w-full bg-gray-50 rounded-2xl animate-pulse" />
                     ))
                 ) : curriculum.length === 0 ? (
-                    <div className="p-8 bg-gray-50 border border-dashed border-gray-200 rounded-[2rem] text-center text-gray-400 font-medium">
-                        No items assigned.
+                    <div className="p-10 bg-gray-50/50 border border-dashed border-gray-200 rounded-3xl text-center">
+                        <PlayCircle className="mx-auto text-gray-300 mb-3" size={32} />
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">No Curriculum Found</p>
                     </div>
                 ) : (
                     curriculum.map((item) => {
@@ -399,39 +412,39 @@ export default function ClassesPage() {
                         return (
                             <motion.div 
                                 key={item.id}
-                                whileHover={!item.isLocked ? { x: 5 } : {}}
+                                whileHover={!item.isLocked ? { scale: 1.01, x: 5 } : {}}
                                 onClick={() => selectItem(item)}
                                 className={cn(
-                                    "p-6 rounded-[2rem] cursor-pointer transition-all duration-400 group relative border",
+                                    "p-4 md:p-5 rounded-2xl md:rounded-3xl cursor-pointer transition-all duration-300 group relative border",
                                     isActive 
-                                        ? "bg-white border-emerald-100 shadow-xl shadow-emerald-900/5" 
+                                        ? "bg-white border-emerald-200 shadow-xl shadow-emerald-900/5 ring-1 ring-emerald-100" 
                                         : item.isLocked 
-                                          ? "bg-gray-50/50 opacity-40 grayscale cursor-not-allowed border-transparent"
-                                          : "bg-gray-50/50 border-transparent hover:bg-white hover:border-gray-100"
+                                          ? "bg-gray-50/30 opacity-40 grayscale cursor-not-allowed border-transparent"
+                                          : "bg-gray-50/50 border-transparent hover:bg-white hover:border-gray-200"
                                 )}
                             >
                                 {isActive && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-10 bg-emerald-600 rounded-r-full shadow-emerald-500 shadow-lg"></div>
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-emerald-600 rounded-r-full" />
                                 )}
-                                <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-4">
                                     <div className={cn(
-                                        "w-12 h-12 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110",
-                                        isActive ? "bg-emerald-600 text-white" : "bg-white border border-gray-100 text-gray-400 group-hover:text-emerald-500"
+                                        "w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0",
+                                        isActive ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/30" : "bg-white border border-gray-100 text-gray-400 group-hover:text-emerald-500"
                                     )}>
-                                        {item.isLocked ? <Lock size={16} /> : item.type === 'EXAM' ? <GraduationCap size={18} /> : item.isCompleted ? <CheckCircle2 size={18} className="text-emerald-600" /> : <Play size={18} fill="currentColor" />}
+                                        {item.isLocked ? <Lock size={14} /> : item.type === 'EXAM' ? <GraduationCap size={16} /> : item.isCompleted ? <CheckCircle2 size={16} className="text-emerald-600" /> : <Play size={16} fill="currentColor" />}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h4 className={cn(
-                                            "text-sm font-black tracking-tight mb-1 truncate",
+                                            "text-xs font-black tracking-tight mb-0.5 truncate",
                                             isActive ? "text-gray-900" : "text-gray-500 group-hover:text-gray-900"
                                         )}>
                                             {item.title}
                                         </h4>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600/60">
-                                                {item.type === 'EXAM' ? 'Assessment' : `Lesson ${item.orderIndex}`}
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600/60">
+                                                {item.type === 'EXAM' ? 'PHASE-GATE' : `UNIT ${item.orderIndex}`}
                                             </span>
-                                            {item.isLocked && <span className="text-[9px] font-black text-amber-600 uppercase tracking-widest bg-amber-50 px-2 py-0.5 rounded">Locked</span>}
+                                            {item.isLocked && <span className="text-[8px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded uppercase tracking-tighter">Locked</span>}
                                         </div>
                                     </div>
                                 </div>

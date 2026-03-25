@@ -52,7 +52,7 @@ export function Sidebar({ className }: { className?: string }) {
       <div className="absolute top-0 right-0 w-px h-full bg-linear-to-b from-transparent via-emerald-500/20 to-transparent"></div>
       
       {/* Brand Header */}
-      <div className="h-28 flex items-center px-8 mb-4">
+      <div className="h-20 flex items-center px-8 mb-4 shrink-0">
         <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
               <GraduationCap className="text-white w-6 h-6" strokeWidth={2} />
