@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Play, Pause, RotateCcw, Volume2, VolumeX, Maximize, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface YouTubeLMSPlayerProps {
   videoId: string;
@@ -168,6 +169,63 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
   };
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!playerRef.current || !isReady) return;
+      
+      switch (e.key.toLowerCase()) {
+        case " ":
+          e.preventDefault();
+          togglePlay();
+          break;
+        case "arrowright":
+          e.preventDefault();
+          skip(10);
+          break;
+        case "arrowleft":
+          e.preventDefault();
+          skip(-10);
+          break;
+        case "f":
+          toggleFullscreen();
+          break;
+        case "m":
+          toggleMute();
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isPlaying, isReady, isMuted, volume]);
+
+  const skip = (seconds: number) => {
+    if (!playerRef.current) return;
+    const current = playerRef.current.getCurrentTime();
+    const target = Math.max(0, Math.min(duration, current + seconds));
+    playerRef.current.seekTo(target, true);
+    setCurrentTime(target);
+    
+    // Show visual feedback
+    const direction = seconds > 0 ? "forward" : "backward";
+    setSkipIndicator(direction);
+    setTimeout(() => setSkipIndicator(null), 800);
+  };
+
+  const [skipIndicator, setSkipIndicator] = useState<"forward" | "backward" | null>(null);
+
+  const handleDoubleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    if (x < rect.width / 3) {
+      skip(-10);
+    } else if (x > (rect.width * 2) / 3) {
+      skip(10);
+    } else {
+      togglePlay(); // Single click toggles play, handled by parent onClick but double click also toggles if not careful
+    }
+  };
+
+  useEffect(() => {
     const handleFsChange = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", handleFsChange);
     return () => document.removeEventListener("fullscreenchange", handleFsChange);
@@ -207,11 +265,43 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
         </div>
       )}
 
-      <div className="absolute inset-0 z-10 cursor-pointer" onClick={togglePlay}>
+      <div 
+        className="absolute inset-0 z-10 cursor-pointer" 
+        onClick={togglePlay}
+        onDoubleClick={handleDoubleClick}
+      >
         <div className="absolute top-0 left-0 w-full h-24 bg-linear-to-b from-black/60 to-transparent flex items-center px-8 opacity-0 group-hover:opacity-100 transition-opacity">
             <span className="text-white font-bold tracking-tight text-lg mb-4">{title}</span>
         </div>
 
+        {/* Skip Indicators */}
+        <AnimatePresence>
+            {skipIndicator && (
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    className={cn(
+                        "absolute top-1/2 -translate-y-1/2 flex flex-col items-center justify-center p-10 bg-black/20 rounded-full backdrop-blur-sm z-30 transition-all text-white",
+                        skipIndicator === 'forward' ? 'right-20' : 'left-20'
+                    )}
+                >
+                    <div className="flex gap-1">
+                        {skipIndicator === 'forward' ? (
+                            <>
+                                <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 0.8 }}><RotateCcw size={40} className="rotate-180" /></motion.div>
+                                <span className="text-2xl font-black">10</span>
+                            </>
+                        ) : (
+                            <>
+                                <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 0.8 }}><RotateCcw size={40} /></motion.div>
+                                <span className="text-2xl font-black">10</span>
+                            </>
+                        )}
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
         <div className="absolute bottom-0 left-0 w-full p-6 bg-linear-to-t from-black/80 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20" onClick={(e) => e.stopPropagation()}>
           <div className="relative w-full h-1.5 bg-white/20 rounded-full mb-4 overflow-hidden group/bar">
              <div className="absolute top-0 left-0 h-full bg-emerald-500 rounded-full z-10 transition-all duration-300" style={{ width: `${(currentTime / duration) * 100}%` }}></div>
@@ -243,7 +333,6 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
             </div>
             
             <div className="flex items-center gap-4">
-                 {/* Watch progress pill */}
                  <div className="hidden sm:flex items-center gap-2 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                      <span className="text-[9px] font-black tracking-widest uppercase text-emerald-500">
@@ -260,28 +349,6 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
           </div>
         </div>
       </div>
-
-
-      {/* Engagement Status Overlay */}
-      {duration > 0 && totalWatchedTime < duration * 0.8 && isPlaying && (
-          <div className="absolute top-6 right-6 z-30 pointer-events-none">
-              <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10 flex items-center gap-3 animate-in slide-in-from-right">
-                  <div className="relative w-8 h-8">
-                      <svg className="w-full h-full translate-[-50%,-50%] -rotate-90">
-                          <circle className="text-white/10" strokeWidth="3" stroke="currentColor" fill="transparent" r="14" cx="16" cy="16" />
-                          <circle 
-                            className="text-emerald-500" strokeWidth="3" strokeDasharray={88} strokeDashoffset={88 - (88 * totalWatchedTime) / (duration * 0.8)} 
-                            strokeLinecap="round" stroke="currentColor" fill="transparent" r="14" cx="16" cy="16" 
-                          />
-                      </svg>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-black text-white/40 uppercase leading-none">Focus Required</span>
-                    <span className="text-xs font-bold text-white uppercase tracking-tight">{Math.floor((duration * 0.8 - totalWatchedTime))}s left to unlock</span>
-                  </div>
-              </div>
-          </div>
-      )}
     </div>
   );
 }

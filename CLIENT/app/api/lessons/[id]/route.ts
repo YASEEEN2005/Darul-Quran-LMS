@@ -13,34 +13,40 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const { id: courseId } = await params;
 
     const lessons = await Lesson.find({ courseId }).sort({ orderIndex: 1 }).lean();
-
-    if (lessons.length === 0) {
-      return NextResponse.json({ success: true, count: 0, data: [] });
-    }
-
+    const Exam = (await import("@/models/Exam")).default;
+    const exams = await Exam.find({ courseId }).sort({ orderIndex: 1 }).lean();
+    const LessonProgress = (await import("@/models/LessonProgress")).default;
+    const ExamResult = (await import("@/models/ExamResult")).default;
+    
     const progresses = await LessonProgress.find({ userId: user.id }).lean();
+    const results = await ExamResult.find({ userId: user.id }).lean();
+
     const completedLessonIds = progresses.filter((p: any) => p.completed).map((p: any) => p.lessonId.toString());
+    const examResultsMap = results.reduce((acc: any, r: any) => {
+        acc[r.examId.toString()] = r.score;
+        return acc;
+    }, {});
 
-    let maxCompletedOrder = 0;
-    progresses.forEach((p: any) => {
-      const lesson = lessons.find((l: any) => l._id.toString() === p.lessonId.toString());
-      if (p.completed && lesson && lesson.orderIndex > maxCompletedOrder) {
-        maxCompletedOrder = lesson.orderIndex;
-      }
-    });
+    const curriculum: any[] = [];
+    lessons.forEach(l => curriculum.push({ ...l, id: l._id.toString(), type: 'LESSON', isCompleted: completedLessonIds.includes(l._id.toString()) }));
+    exams.forEach(e => curriculum.push({ ...e, id: e._id.toString(), type: 'EXAM', score: examResultsMap[e._id.toString()] || 0, isCompleted: (examResultsMap[e._id.toString()] || 0) >= 70 }));
 
-    const formatted = lessons.map((l: any) => {
-      const isCompleted = completedLessonIds.includes(l._id.toString());
-      
-      // A lesson is locked if its order is greater than (max completed + 1)
-      const isLocked = l.orderIndex > maxCompletedOrder + 1;
-      
-      return {
-        ...l,
-        id: l._id.toString(),
-        isCompleted,
-        isLocked,
-      };
+    curriculum.sort((a, b) => a.orderIndex - b.orderIndex);
+
+    let currentLocked = false;
+    const formatted = curriculum.map((item, idx) => {
+        let isLocked = false;
+        if (idx === 0) {
+            isLocked = false;
+        } else {
+            const prev = curriculum[idx - 1];
+            if (!prev.isCompleted) isLocked = true;
+        }
+
+        if (currentLocked) isLocked = true;
+        if (isLocked) currentLocked = true;
+
+        return { ...item, isLocked };
     });
 
     return NextResponse.json({ success: true, count: formatted.length, data: formatted });

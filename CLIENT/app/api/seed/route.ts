@@ -119,36 +119,75 @@ export async function GET() {
         });
     }
 
-    // 3. Create a Demo Exam for the C Course
+    // 6. Create Operating System BCA 6th Sem Course (3 Modules)
+    const osCourse = await Course.create({
+        title: "Operating Systems (Calicut University - BCA)",
+        description: "In-depth study of OS concepts including process synchronization, memory management, and file systems. Modular curriculum with mandatory grading.",
+    });
+
+    // Module 1: Introduction (3 lessons)
+    const osModule1 = [
+        { title: "Introduction to Operating Systems", id: "79PXp_t8hkU", order: 1 },
+        { title: "OS Structures & System Calls", id: "mPCzY7b_-YY", order: 2 },
+        { title: "Evolution of OS & Multiprogramming", id: "KJgsSFOSQv0", order: 3 }
+    ];
+
+    for (const l of osModule1) {
+        await Lesson.create({
+            courseId: osCourse._id,
+            title: `Module 1: ${l.title}`,
+            videoUrl: `https://www.youtube.com/embed/${l.id}`,
+            orderIndex: l.order,
+            moduleNumber: 1
+        });
+    }
+
+    // Exam for Module 1
     await Exam.create({
-        courseId: cCourse._id,
-        title: "Programming Fundamentals Proficiency",
-        orderIndex: 1,
+        courseId: osCourse._id,
+        title: "Module 1 Phase-Gate Exam",
+        orderIndex: 1, // Represents module 1's gate
         questions: [
-            {
-                text: "Which of the following is a literal in C?",
-                options: ["123", "int", "float", "main"],
-                correctOptionIndex: 0,
-            },
-            {
-                text: "What is the size of 'int' on most 64-bit systems?",
-                options: ["2 bytes", "4 bytes", "8 bytes", "Depends on compiler"],
-                correctOptionIndex: 1,
-            },
-            {
-                text: "Which keyword is used to skip the rest of the current loop iteration?",
-                options: ["break", "continue", "skip", "next"],
-                correctOptionIndex: 1,
-            }
+            { text: "What is the primary purpose of an Operating System?", options: ["Compiling code", "Bridging User and Hardware", "Storing Photos", "None"], correctOptionIndex: 1 },
+            { text: "Which system call is used to create a new process?", options: ["fork()", "exit()", "wait()", "read()"], correctOptionIndex: 0 },
+            { text: "Multiprogramming allows for what benefit?", options: ["Single Tasking", "Higher CPU Utilization", "Slow context switching", "Deleting files"], correctOptionIndex: 1 }
+        ]
+    });
+
+    // Module 2: Process Management (3 lessons)
+    const osModule2 = [
+        { title: "Process Scheduling Algorithms", id: "4-V0JvN7fO4", order: 4 },
+        { title: "Critical Section Problem & Semaphores", id: "4-V0JvN7fO4", order: 5 },
+        { title: "CPU Scheduling Implementation", id: "4-V0JvN7fO4", order: 6 }
+    ];
+
+    for (const l of osModule2) {
+        await Lesson.create({
+            courseId: osCourse._id,
+            title: `Module 2: ${l.title}`,
+            videoUrl: `https://www.youtube.com/embed/${l.id}`,
+            orderIndex: l.order,
+            moduleNumber: 2
+        });
+    }
+
+    // Exam for Module 2
+    await Exam.create({
+        courseId: osCourse._id,
+        title: "Module 2 Advance Assessment",
+        orderIndex: 2, 
+        questions: [
+            { text: "Which scheduling algorithm is non-preemptive?", options: ["FCFS", "RR", "SRTF", "None"], correctOptionIndex: 0 },
+            { text: "A stalemate in process execution is called?", options: ["Deadlock", "Lockout", "Starvation", "Busy Waiting"], correctOptionIndex: 0 }
         ]
     });
 
     return NextResponse.json({ 
         success: true, 
-        message: "Database seeded successfully with premium curriculum!",
-        coursesCreated: 4,
-        lessonsCreated: playlist.length + quranLessons.length + fiqhLessons.length + seerahLessons.length,
-        examsCreated: 1
+        message: "Premium Modular BCA Curriculum Seeded!",
+        coursesCreated: 5,
+        lessonsCreated: playlist.length + quranLessons.length + fiqhLessons.length + seerahLessons.length + osModule1.length + osModule2.length,
+        examsCreated: 3
     });
 
   } catch (error: any) {
