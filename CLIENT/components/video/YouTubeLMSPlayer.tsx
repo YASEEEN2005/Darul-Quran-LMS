@@ -71,19 +71,27 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
           setIsReady(true);
           setDuration(event.target.getDuration());
         },
-        onStateChange: (event: any) => {
-          if (event.data === window.YT.PlayerState.PLAYING) {
-            setIsPlaying(true);
-          } else {
-            setIsPlaying(false);
-          }
-
-          if (event.data === window.YT.PlayerState.ENDED) {
-            onComplete();
-          }
-        },
+        onStateChange: handleStateChange,
       },
     });
+  };
+
+  const [hasStarted, setHasStarted] = useState(false);
+  const handleStateChange = (event: any) => {
+    if (event.data === window.YT.PlayerState.PLAYING) {
+        setIsPlaying(true);
+        setHasStarted(true);
+    } else if (event.data === window.YT.PlayerState.BUFFERING) {
+        // Suppress thumbnail cover during buffering
+        setIsPlaying(true);
+    } else {
+        setIsPlaying(false);
+    }
+
+    if (event.data === window.YT.PlayerState.ENDED) {
+        onComplete();
+        setHasStarted(false); // Cover back at end
+    }
   };
 
   const [totalWatchedTime, setTotalWatchedTime] = useState(0);
@@ -238,8 +246,8 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
     >
       <div id={`youtube-player-${videoId}`} className="absolute inset-0 w-full h-full pointer-events-none scale-[1.35] translate-y-[-2%]"></div>
       
-      {/* Premium Cover Overlay to hide YouTube branding */}
-      {!isPlaying && (
+      {/* Premium Cover Overlay - ONLY show before first play or after reset */}
+      {!hasStarted && (
         <div 
             className="absolute inset-0 z-20 bg-cover bg-center transition-all duration-700"
             style={{ backgroundImage: `url(https://img.youtube.com/vi/${videoId}/maxresdefault.jpg)` }}
@@ -274,30 +282,32 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
             <span className="text-white font-bold tracking-tight text-lg mb-4">{title}</span>
         </div>
 
-        {/* Skip Indicators */}
+        {/* Triple-Arrow Skip Indicators (YouTube Style) */}
         <AnimatePresence>
             {skipIndicator && (
                 <motion.div 
-                    initial={{ opacity: 0, scale: 0.5 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
+                    key={skipIndicator}
                     className={cn(
-                        "absolute top-1/2 -translate-y-1/2 flex flex-col items-center justify-center p-10 bg-black/20 rounded-full backdrop-blur-sm z-30 transition-all text-white",
-                        skipIndicator === 'forward' ? 'right-20' : 'left-20'
+                        "absolute top-1/2 -translate-y-1/2 flex flex-col items-center justify-center p-14 bg-black/40 rounded-full backdrop-blur-md z-30 transition-all text-white",
+                        skipIndicator === 'forward' ? 'right-24' : 'left-24'
                     )}
                 >
-                    <div className="flex gap-1">
-                        {skipIndicator === 'forward' ? (
-                            <>
-                                <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 0.8 }}><RotateCcw size={40} className="rotate-180" /></motion.div>
-                                <span className="text-2xl font-black">10</span>
-                            </>
-                        ) : (
-                            <>
-                                <motion.div animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 0.8 }}><RotateCcw size={40} /></motion.div>
-                                <span className="text-2xl font-black">10</span>
-                            </>
-                        )}
+                    <div className="flex flex-col items-center gap-1">
+                        <div className="flex -space-x-4">
+                            {[0, 1, 2].map(i => (
+                                <motion.div 
+                                    key={i}
+                                    animate={{ opacity: [0.2, 1, 0.2] }} 
+                                    transition={{ repeat: Infinity, duration: 0.6, delay: i * 0.1 }}
+                                >
+                                    <RotateCcw size={32} className={skipIndicator === 'forward' ? "rotate-180" : ""} />
+                                </motion.div>
+                            ))}
+                        </div>
+                        <span className="text-xl font-black mt-2 tracking-tighter">10 SECONDS</span>
                     </div>
                 </motion.div>
             )}
