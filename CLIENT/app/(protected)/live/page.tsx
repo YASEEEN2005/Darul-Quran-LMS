@@ -42,9 +42,9 @@ export default function LiveClassesPage() {
         </div>
         
         {/* Placeholder for timezone */}
-        <div className="bg-emerald-50 px-5 py-3 rounded-2xl border border-emerald-100/50 flex items-center gap-3">
-            <Clock size={16} className="text-emerald-600" />
-            <span className="text-xs font-black text-emerald-800 uppercase tracking-widest">Active Timezone: UTC (+05:30)</span>
+        <div className="bg-emerald-50 px-3 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl border border-emerald-100/50 flex items-center gap-2 sm:gap-3">
+            <Clock size={14} className="text-emerald-600 sm:w-4 sm:h-4" />
+            <span className="text-[10px] sm:text-xs font-black text-emerald-800 uppercase tracking-widest leading-none">Active Timezone: UTC (+05:30)</span>
         </div>
       </div>
 
@@ -71,24 +71,24 @@ export default function LiveClassesPage() {
                 <Card className="flex flex-col h-full bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-900/10 transition-all duration-700 overflow-hidden group">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-700"></div>
                   
-                  <CardHeader className="p-8 pb-4">
+                  <CardHeader className="p-6 md:p-8 pb-4">
                     <div className="flex justify-between items-start mb-6">
-                        <div className="bg-emerald-50 w-14 h-14 rounded-2xl flex items-center justify-center text-emerald-600 shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition-all group-hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-                            <Video className="h-6 w-6" strokeWidth={2.5} />
+                        <div className="bg-emerald-50 w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center text-emerald-600 shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition-all group-hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                            <Video className="h-5 w-5 md:h-6 md:w-6" strokeWidth={2.5} />
                         </div>
-                        <div className="px-3 py-1 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-full flex items-center gap-1.5 shadow-sm">
+                        <div className="px-2.5 py-1 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-full flex items-center gap-1.5 shadow-sm">
                             <CalendarDays className="h-3 w-3" strokeWidth={2.5} />
                             <span className="text-[10px] font-black uppercase tracking-widest">{new Date(meeting.date).toLocaleDateString()}</span>
                         </div>
                     </div>
-                    <CardTitle className="text-2xl font-black text-gray-900 tracking-tight leading-tight group-hover:text-emerald-700 transition-colors uppercase">{meeting.title}</CardTitle>
+                    <CardTitle className="text-xl md:text-2xl font-black text-gray-900 tracking-tight leading-tight group-hover:text-emerald-700 transition-colors uppercase">{meeting.title}</CardTitle>
                     <CardDescription className="flex items-center gap-1.5 text-gray-400 font-bold uppercase tracking-widest mt-2">
                         <Clock size={12} className="text-emerald-500/50" />
                         Scheduled for {new Date(meeting.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </CardDescription>
                   </CardHeader>
                   
-                  <CardContent className="p-8 pt-0 flex-1">
+                  <CardContent className="p-6 md:p-8 pt-0 flex-1">
                     <div className="flex items-center gap-4 text-gray-500">
                         <div className="flex -space-x-2">
                              {[1,2,3].map(i => (
@@ -101,7 +101,7 @@ export default function LiveClassesPage() {
                     </div>
                   </CardContent>
 
-                  <CardFooter className="p-8 pt-0">
+                  <CardFooter className="p-6 md:p-8 pt-0">
                     <Button 
                         asChild 
                         className="w-full h-14 rounded-2xl bg-[#011c18] hover:bg-emerald-600 text-white font-black shadow-xl shadow-emerald-500/10 transition-all flex items-center justify-center gap-3"

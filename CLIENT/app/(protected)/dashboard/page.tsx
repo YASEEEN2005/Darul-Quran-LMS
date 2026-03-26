@@ -96,8 +96,8 @@ export default function DashboardPage() {
                 <Sparkles size={12} className="animate-spin-slow" />
                 Institute Performance Tier
             </motion.div>
-            <h1 className="text-2xl md:text-6xl font-black text-white mb-4 tracking-tight leading-tight">
-                Salaam, <span className="text-emerald-400">{user?.name?.split(' ')[0]}</span>. <br className="hidden md:block" />
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 tracking-tight leading-[1.1]">
+                Salaam, <span className="text-emerald-400">{user?.name?.split(' ')[0]}</span>. <br className="hidden sm:block" />
                 Ready for <span className="underline decoration-emerald-500/30 decoration-8 underline-offset-4">Module {stats?.completedExams + 1 || 1}</span>?
             </h1>
             <p className="text-emerald-100/40 text-sm md:text-lg font-medium leading-relaxed mb-8 max-w-lg">
@@ -129,36 +129,46 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          <div className="hidden lg:flex items-center gap-10 bg-white/5 backdrop-blur-2xl border border-white/10 p-10 rounded-[3rem] shadow-2xl relative">
-              <div className="absolute inset-0 bg-emerald-500/5 rounded-[3rem] animate-pulse"></div>
+          <div className="hidden sm:flex items-center gap-6 md:gap-10 bg-white/5 backdrop-blur-2xl border border-white/10 p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl relative">
+              <div className="absolute inset-0 bg-emerald-500/5 rounded-[2.5rem] md:rounded-[3rem] animate-pulse"></div>
               <div className="relative z-10 flex flex-col items-center">
-                  <div className="relative w-32 h-32 flex items-center justify-center">
+                  <div className="relative w-24 h-24 md:w-32 md:h-32 flex items-center justify-center">
                       <svg className="w-full h-full -rotate-90">
-                          <circle cx="64" cy="64" r="58" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="10" />
+                          <circle cx={48} cy={48} r={42} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="8" className="md:hidden" />
+                          <circle cx={64} cy={64} r={58} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="10" className="hidden md:block" />
                           <circle 
-                            cx="64" cy="64" r="58" 
+                            cx={48} cy={48} r={42} 
+                            fill="none" stroke="#10b981" 
+                            strokeWidth="8" 
+                            strokeDasharray="264" 
+                            strokeDashoffset={264 - (264 * (stats?.overallCompletion || 0) / 100)} 
+                            strokeLinecap="round"
+                            className="md:hidden transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(16,185,129,0.5)]"
+                          />
+                          <circle 
+                            cx={64} cy={64} r={58} 
                             fill="none" stroke="#10b981" 
                             strokeWidth="10" 
                             strokeDasharray="364" 
                             strokeDashoffset={364 - (364 * (stats?.overallCompletion || 0) / 100)} 
                             strokeLinecap="round"
-                            className="transition-all duration-1000 ease-out shadow-[0_0_20px_rgba(16,185,129,0.5)]"
+                            className="hidden md:block transition-all duration-1000 ease-out shadow-[0_0_20px_rgba(16,185,129,0.5)]"
                           />
                       </svg>
                       <div className="absolute text-center">
-                        <span className="text-3xl font-black text-white block leading-none">{stats?.overallCompletion || 0}%</span>
-                        <span className="text-[8px] font-black text-emerald-400 uppercase tracking-widest mt-1">Audit</span>
+                        <span className="text-xl md:text-3xl font-black text-white block leading-none">{stats?.overallCompletion || 0}%</span>
+                        <span className="text-[7px] md:text-[8px] font-black text-emerald-400 uppercase tracking-widest mt-1">Audit</span>
                       </div>
                   </div>
-                  <span className="text-[10px] text-emerald-100/30 uppercase tracking-[0.2em] font-black mt-6">Course Integrity</span>
+                  <span className="text-[8px] md:text-[10px] text-emerald-100/30 uppercase tracking-[0.2em] font-black mt-4 md:mt-6">Course Integrity</span>
               </div>
-              <div className="h-24 w-px bg-white/10"></div>
-              <div className="relative z-10 flex flex-col items-center">
-                  <span className="text-5xl font-black text-white tracking-tighter tabular-nums">{stats?.completedLessons || 0}</span>
-                  <span className="text-[10px] text-emerald-100/30 uppercase tracking-[0.2em] font-black mt-3">Units Verified</span>
-                  <div className="mt-4 flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 rounded-full border border-emerald-500/30">
-                     <CheckCircle2 size={10} className="text-emerald-400" />
-                     <span className="text-[8px] font-black text-emerald-200">Phase 1 Secure</span>
+              <div className="h-16 md:h-24 w-px bg-white/10"></div>
+              <div className="relative z-10 flex flex-col items-center text-center">
+                  <span className="text-3xl md:text-5xl font-black text-white tracking-tighter tabular-nums">{stats?.completedLessons || 0}</span>
+                  <span className="text-[8px] md:text-[10px] text-emerald-100/30 uppercase tracking-[0.2em] font-black mt-2 md:mt-3">Units Verified</span>
+                  <div className="mt-3 md:mt-4 flex items-center gap-1.5 px-2 md:px-3 py-1 bg-emerald-500/20 rounded-full border border-emerald-500/30">
+                     <CheckCircle2 size={8} className="text-emerald-400 md:w-[10px] md:h-[10px]" />
+                     <span className="text-[7px] md:text-[8px] font-black text-emerald-200">Phase 1 Secure</span>
                   </div>
               </div>
           </div>

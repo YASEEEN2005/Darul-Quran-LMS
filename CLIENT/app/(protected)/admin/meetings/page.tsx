@@ -52,7 +52,7 @@ export default function AdminMeetingsPage() {
               <label className="text-sm font-medium">Google Meet URL</label>
               <Input type="url" required value={meetLink} onChange={e => setMeetLink(e.target.value)} placeholder="https://meet.google.com/xyz" />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Date</label>
                 <Input type="date" required value={date} onChange={e => setDate(e.target.value)} />

@@ -51,6 +51,7 @@ export default function ClassesPage() {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentDuration, setCurrentDuration] = useState(0);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   
   const { markLessonComplete } = useProgressStore();
   const { toast } = useToast();
@@ -205,13 +206,16 @@ export default function ClassesPage() {
     <div className="max-w-[1600px] mx-auto pb-20 px-4 md:px-8 space-y-8">
       
       {/* Dynamic Header Section */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pt-8 md:pt-12 border-b border-gray-100 pb-10">
+      <div className={cn(
+          "flex flex-col lg:flex-row lg:items-center justify-between gap-8 pt-8 md:pt-12 border-b border-gray-100 pb-10 transition-all duration-500",
+          isVideoPlaying && "hidden lg:flex md:hidden opacity-0 lg:opacity-100"
+      )}>
         <div className="space-y-3">
             <div className="flex items-center gap-2 text-emerald-600 font-black uppercase tracking-[0.25em] text-[10px] md:text-xs">
                 <GraduationCap size={16} />
                 LMS Environment
             </div>
-            <h1 className="text-2xl md:text-5xl font-black tracking-tighter text-gray-900 leading-tight">Virtual Classroom</h1>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter text-gray-900 leading-[1.1]">Virtual Classroom</h1>
             <p className="text-gray-500 font-medium text-xs md:text-base max-w-xl">
                 Engage with immersive university-standard scholarship through our modular academic framework.
             </p>
@@ -244,6 +248,7 @@ export default function ClassesPage() {
                             videoId={getYouTubeId(activeItem.videoUrl || "") || ""} 
                             onComplete={handleVideoComplete}
                             onProgress={handleProgress}
+                            onPlayChange={setIsVideoPlaying}
                             title={activeItem.title}
                         />
                     </div>
@@ -329,11 +334,13 @@ export default function ClassesPage() {
 
             {/* Content Details Mobile Toggle / Header */}
             <AnimatePresence mode="wait">
+                {!isVideoPlaying && (
                 <motion.div 
                     key={activeItemId}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-3xl p-6 md:p-10 border border-gray-100 shadow-sm"
+                    exit={{ opacity: 0, height: 0 }}
+                    className="bg-white rounded-3xl p-6 md:p-10 border border-gray-100 shadow-sm overflow-hidden"
                 >
                     <div className="flex flex-col lg:flex-row justify-between gap-10">
                         <div className="flex-1 space-y-6">
@@ -354,7 +361,7 @@ export default function ClassesPage() {
                                     </div>
                                 )}
                             </div>
-                            <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter leading-tight">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 tracking-tighter leading-tight">
                                 {activeItem?.title || "Classroom Empty"}
                             </h2>
                             <p className="text-gray-500 text-base md:text-lg leading-relaxed font-medium">
@@ -454,11 +461,15 @@ export default function ClassesPage() {
                         </div>
                     </div>
                 </motion.div>
+                )}
             </AnimatePresence>
         </div>
 
         {/* Sidebar Curriculum */}
-        <div className="lg:col-span-4 space-y-6">
+        <div className={cn(
+            "lg:col-span-4 space-y-6 transition-all duration-500",
+            isVideoPlaying && "hidden lg:block md:hidden opacity-0 lg:opacity-100"
+        )}>
             <div className="flex flex-col gap-5 px-2">
                 <div className="flex items-center justify-between">
                     <h3 className="text-lg font-black text-gray-900 tracking-tighter">Academic Path</h3>

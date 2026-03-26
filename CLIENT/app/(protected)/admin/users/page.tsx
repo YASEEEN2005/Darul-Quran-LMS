@@ -46,50 +46,69 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
-        <p className="text-muted-foreground">View and approve student registrations.</p>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
+          <p className="text-muted-foreground">View and approve student registrations.</p>
+        </div>
+        <Button onClick={fetchUsers} variant="outline" size="sm" className="hidden sm:flex">Refresh List</Button>
       </div>
 
-      <div className="rounded-md border bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow><TableCell colSpan={5} className="text-center py-8">Loading users...</TableCell></TableRow>
-            ) : users.length === 0 ? (
-              <TableRow><TableCell colSpan={5} className="text-center py-8">No users found.</TableCell></TableRow>
-            ) : (
-              users.map((u) => (
-                <TableRow key={u.id}>
-                  <TableCell className="font-medium">{u.name}</TableCell>
-                  <TableCell>{u.email}</TableCell>
-                  <TableCell>{u.role}</TableCell>
-                  <TableCell>
-                    {u.approved ? (
-                      <span className="text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-2 py-1 rounded-full text-xs font-semibold">Approved</span>
-                    ) : (
-                      <span className="text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-400 px-2 py-1 rounded-full text-xs font-semibold">Pending</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {!u.approved && (
-                      <Button size="sm" onClick={() => handleApprove(u.id)}>Approve</Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+      <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table className="min-w-[800px]">
+            <TableHeader>
+              <TableRow className="bg-muted/50">
+                <TableHead className="font-bold">Name</TableHead>
+                <TableHead className="font-bold">Email</TableHead>
+                <TableHead className="font-bold">Role</TableHead>
+                <TableHead className="font-bold">Status</TableHead>
+                <TableHead className="text-right font-bold px-6">Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow><TableCell colSpan={5} className="text-center py-12">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-8 h-8 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+                    <span className="text-xs font-medium text-muted-foreground tracking-widest uppercase">Syncing Users...</span>
+                  </div>
+                </TableCell></TableRow>
+              ) : users.length === 0 ? (
+                <TableRow><TableCell colSpan={5} className="text-center py-12">
+                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                    <span className="font-bold">No Records</span>
+                    <span className="text-xs uppercase tracking-widest">Database is currently empty</span>
+                  </div>
+                </TableCell></TableRow>
+              ) : (
+                users.map((u) => (
+                  <TableRow key={u.id} className="hover:bg-muted/30 transition-colors">
+                    <TableCell className="font-bold text-gray-900">{u.name}</TableCell>
+                    <TableCell className="font-medium text-muted-foreground">{u.email}</TableCell>
+                    <TableCell>
+                      <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-[10px] font-black uppercase tracking-widest">
+                        {u.role}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {u.approved ? (
+                        <span className="text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter">Approved</span>
+                      ) : (
+                        <span className="text-amber-700 bg-amber-50 border border-amber-100 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter">Pending</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right px-6">
+                      {!u.approved && (
+                        <Button size="sm" onClick={() => handleApprove(u.id)} className="bg-emerald-600 hover:bg-emerald-700 font-bold shadow-lg shadow-emerald-600/20">Approve User</Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

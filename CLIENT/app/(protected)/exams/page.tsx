@@ -110,25 +110,25 @@ export default function ExamsPage() {
               </div>
               
               <div>
-                <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-4 leading-none">
+                <h1 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tighter mb-4 leading-none">
                   {activeExam.title}
                 </h1>
-                <p className="text-emerald-100/60 text-lg font-medium max-w-xl mx-auto italic">
+                <p className="text-emerald-100/60 text-base md:text-lg font-medium max-w-xl mx-auto italic">
                   "Knowledge is the light of the heart; you have successfully illuminated your path through this module."
                 </p>
               </div>
 
-              <div className="flex flex-col md:flex-row justify-center items-center gap-8 py-8">
-                <div className="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] backdrop-blur-xl w-full md:w-64 transform hover:scale-105 transition-transform duration-500 underline-offset-8">
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-6 md:gap-8 py-8">
+                <div className="bg-white/5 border border-white/10 p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] backdrop-blur-xl w-full sm:w-64 transform hover:scale-105 transition-transform duration-500">
                    <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400/60 mb-2">Achieved Mastery</span>
-                   <span className="text-6xl font-black tracking-tighter">{Math.round(score)}%</span>
+                   <span className="text-5xl md:text-6xl font-black tracking-tighter">{Math.round(score)}%</span>
                 </div>
-
-                <div className="bg-emerald-500/10 border border-emerald-500/20 p-10 rounded-[2.5rem] backdrop-blur-xl w-full md:w-64 transform hover:scale-105 transition-transform duration-500">
+ 
+                <div className="bg-emerald-500/10 border border-emerald-500/20 p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] backdrop-blur-xl w-full sm:w-64 transform hover:scale-105 transition-transform duration-500">
                    <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-emerald-400/60 mb-2">Prestige Earned</span>
                    <div className="flex items-center justify-center gap-2">
-                      <Sparkles size={24} className="text-emerald-400" />
-                      <span className="text-5xl font-black tracking-tighter">+{activeExam.questions.length * 10}</span>
+                       <Sparkles size={24} className="text-emerald-400" />
+                       <span className="text-4xl md:text-5xl font-black tracking-tighter">+{activeExam.questions.length * 10}</span>
                    </div>
                 </div>
                 
@@ -213,15 +213,15 @@ export default function ExamsPage() {
                   transition={{ delay: i * 0.1 }}
                   key={qId}
               >
-                  <Card className="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-500">
-                    <CardHeader className="p-8 pb-4">
+                  <Card className="bg-white rounded-[1.5rem] md:rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden group hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-500">
+                    <CardHeader className="p-6 md:p-8 pb-4">
                       <div className="flex items-center justify-between mb-4">
                           <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-600/50">Curriculum Point {i + 1}</span>
                           <HelpCircle size={16} className="text-gray-300" />
                       </div>
-                      <CardTitle className="text-xl md:text-2xl font-black text-gray-900 tracking-tight leading-tight">{q.text}</CardTitle>
+                      <CardTitle className="text-lg sm:text-xl md:text-2xl font-black text-gray-900 tracking-tight leading-tight">{q.text}</CardTitle>
                     </CardHeader>
-                    <CardContent className="px-8 pb-8 space-y-3">
+                    <CardContent className="px-6 md:px-8 pb-6 md:pb-8 space-y-3">
                       {q.options.map((opt: string, optIdx: number) => (
                         <div 
                           key={`${qId}-opt-${optIdx}`}
@@ -284,12 +284,12 @@ export default function ExamsPage() {
         </div>
 
         {/* Global tab placeholder */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
             {courses.map(course => (
                 <button 
                     key={course.id}
                     onClick={() => setSelectedCourse(course.id)}
-                    className={`whitespace-nowrap px-6 py-2.5 rounded-2xl text-[12px] font-black transition-all ${selectedCourse === course.id ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-500/20' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+                    className={`whitespace-nowrap px-6 py-2.5 rounded-2xl text-[12px] font-black transition-all ${selectedCourse === course.id ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-500/20' : 'bg-gray-100 text-gray-400 hover:bg-gray-200 cursor-pointer'}`}
                 >
                     {course.title.split(' ')[0]}...
                 </button>

@@ -17,6 +17,7 @@ interface YouTubeLMSPlayerProps {
   videoId: string;
   onComplete: () => void;
   onProgress?: (currentTime: number, duration: number) => void;
+  onPlayChange?: (isPlaying: boolean) => void;
   title?: string;
 }
 
@@ -27,7 +28,7 @@ declare global {
   }
 }
 
-export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, title }: YouTubeLMSPlayerProps) {
+export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, onPlayChange, title }: YouTubeLMSPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const [isReady, setIsReady] = useState(false);
@@ -94,6 +95,11 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
         setIsPlaying(true);
     } else {
         setIsPlaying(false);
+        if (onPlayChange) onPlayChange(false);
+    }
+
+    if (onPlayChange && event.data === window.YT.PlayerState.PLAYING) {
+        onPlayChange(true);
     }
 
     if (event.data === window.YT.PlayerState.ENDED) {
@@ -143,6 +149,11 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
     const val = parseFloat(e.target.value);
     playerRef.current.seekTo(val, true);
     setCurrentTime(val);
+    
+    // Ensure playback resumes if it was playing
+    if (isPlaying) {
+        playerRef.current.playVideo();
+    }
   };
 
   const [isMuted, setIsMuted] = useState(false);
@@ -220,6 +231,11 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, titl
     const target = Math.max(0, Math.min(duration, current + seconds));
     playerRef.current.seekTo(target, true);
     setCurrentTime(target);
+    
+    // Ensure playback resumes if it was playing
+    if (isPlaying) {
+        playerRef.current.playVideo();
+    }
     
     // Show visual feedback
     const direction = seconds > 0 ? "forward" : "backward";
