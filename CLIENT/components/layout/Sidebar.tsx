@@ -28,7 +28,6 @@ export function Sidebar({ className }: { className?: string }) {
   const studentLinks = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "My Courses", href: "/classes", icon: BookOpen },
-    { name: "Video Gallery", href: "/classes", icon: PlaySquare },
     { name: "Exams & Quiz", href: "/exams", icon: FileEdit },
     { name: "Live Hall", href: "/live", icon: Video },
     { name: "My Progress", href: "/progress", icon: CheckSquare },

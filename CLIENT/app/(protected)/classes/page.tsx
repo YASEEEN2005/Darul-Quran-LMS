@@ -203,14 +203,13 @@ export default function ClassesPage() {
   };
 
   return (
-    <div className="max-w-[1600px] mx-auto pb-20 px-4 md:px-8 space-y-8">
+    <div className="max-w-[1600px] w-full mx-auto pb-20 px-4 md:px-8 space-y-8 overflow-x-clip">
       
       {/* Dynamic Header Section */}
       <div className={cn(
-          "flex flex-col lg:flex-row lg:items-center justify-between gap-8 pt-8 md:pt-12 border-b border-gray-100 pb-10 transition-all duration-500",
-          isVideoPlaying && "hidden lg:flex md:hidden opacity-0 lg:opacity-100"
+          "flex flex-col lg:flex-row lg:items-center justify-between gap-8 pt-8 md:pt-12 border-b border-gray-100 pb-10 transition-all duration-500"
       )}>
-        <div className="space-y-3">
+        <div className="space-y-3 min-w-0">
             <div className="flex items-center gap-2 text-emerald-600 font-black uppercase tracking-[0.25em] text-[10px] md:text-xs">
                 <GraduationCap size={16} />
                 LMS Environment
@@ -221,12 +220,12 @@ export default function ClassesPage() {
             </p>
         </div>
         
-        <div className="flex bg-gray-50 p-1.5 rounded-2xl border border-gray-100 overflow-x-auto scrollbar-hide">
+        <div className="flex w-full lg:w-auto min-w-0 bg-gray-50 p-1.5 rounded-2xl border border-gray-100 overflow-x-auto scrollbar-hide">
             {courses.map(course => (
                 <button 
                     key={course.id}
                     onClick={() => { setSelectedCourse(course.id); setActiveItemId(null); }}
-                    className={`whitespace-nowrap px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-400 ${selectedCourse === course.id ? 'bg-white text-emerald-800 shadow-xl shadow-emerald-900/5' : 'text-gray-400 hover:text-gray-600 cursor-pointer'}`}
+                    className={`whitespace-nowrap shrink-0 px-6 py-2.5 rounded-xl text-xs font-black transition-all duration-400 ${selectedCourse === course.id ? 'bg-white text-emerald-800 shadow-xl shadow-emerald-900/5' : 'text-gray-400 hover:text-gray-600 cursor-pointer'}`}
                 >
                     {course.title}
                 </button>
@@ -234,12 +233,11 @@ export default function ClassesPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-start w-full">
         
         {/* Main Instruction Area */}
-        <div className="lg:col-span-8 space-y-8">
+        <div className="lg:col-span-8 space-y-8 min-w-0 w-full">
             <motion.div 
-                layoutId="player"
                 className="w-full aspect-video bg-black rounded-3xl md:rounded-[2.5rem] overflow-hidden shadow-2xl shadow-emerald-900/10 border border-gray-100 relative group"
             >
                 {activeItem?.type === 'LESSON' ? (
@@ -334,7 +332,6 @@ export default function ClassesPage() {
 
             {/* Content Details Mobile Toggle / Header */}
             <AnimatePresence mode="wait">
-                {!isVideoPlaying && (
                 <motion.div 
                     key={activeItemId}
                     initial={{ opacity: 0, y: 10 }}
@@ -461,14 +458,12 @@ export default function ClassesPage() {
                         </div>
                     </div>
                 </motion.div>
-                )}
             </AnimatePresence>
         </div>
 
         {/* Sidebar Curriculum */}
         <div className={cn(
-            "lg:col-span-4 space-y-6 transition-all duration-500",
-            isVideoPlaying && "hidden lg:block md:hidden opacity-0 lg:opacity-100"
+            "lg:col-span-4 space-y-6 transition-all duration-500 min-w-0 w-full"
         )}>
             <div className="flex flex-col gap-5 px-2">
                 <div className="flex items-center justify-between">

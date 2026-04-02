@@ -64,6 +64,8 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, onPl
     }
 
     playerRef.current = new window.YT.Player(`youtube-player-${videoId}`, {
+      width: '100%',
+      height: '100%',
       videoId,
       playerVars: {
         autoplay: 0,
@@ -113,7 +115,7 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, onPl
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (playerRef.current && isPlaying) {
+      if (playerRef.current && playerRef.current.getCurrentTime && isPlaying) {
         const time = playerRef.current.getCurrentTime();
         setCurrentTime(time);
         if (onProgress) onProgress(time, duration);
@@ -138,6 +140,7 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, onPl
   }, [isPlaying, duration, hasCompleted]);
 
   const togglePlay = () => {
+    if (!playerRef.current || !playerRef.current.playVideo) return;
     if (isPlaying) {
       playerRef.current.pauseVideo();
     } else {
@@ -146,6 +149,7 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, onPl
   };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!playerRef.current || !playerRef.current.seekTo) return;
     const val = parseFloat(e.target.value);
     playerRef.current.seekTo(val, true);
     setCurrentTime(val);
@@ -163,6 +167,7 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, onPl
   // ... (previous useEffects for YT API and progress tracking)
 
   const toggleMute = () => {
+    if (!playerRef.current || !playerRef.current.mute) return;
     if (isMuted) {
       playerRef.current.unMute();
       setIsMuted(false);
@@ -173,6 +178,7 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, onPl
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!playerRef.current || !playerRef.current.setVolume) return;
     const val = parseInt(e.target.value);
     setVolume(val);
     playerRef.current.setVolume(val);
@@ -226,14 +232,14 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, onPl
   }, [isPlaying, isReady, isMuted, volume]);
 
   const skip = (seconds: number) => {
-    if (!playerRef.current) return;
+    if (!playerRef.current || !playerRef.current.getCurrentTime) return;
     const current = playerRef.current.getCurrentTime();
     const target = Math.max(0, Math.min(duration, current + seconds));
     playerRef.current.seekTo(target, true);
     setCurrentTime(target);
     
     // Ensure playback resumes if it was playing
-    if (isPlaying) {
+    if (isPlaying && playerRef.current.playVideo) {
         playerRef.current.playVideo();
     }
     
@@ -244,6 +250,21 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, onPl
   };
 
   const [skipIndicator, setSkipIndicator] = useState<"forward" | "backward" | null>(null);
+  const [showControls, setShowControls] = useState(true);
+  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleInteraction = () => {
+      setShowControls(true);
+      if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+      controlsTimeoutRef.current = setTimeout(() => {
+          if (isPlaying) setShowControls(false);
+      }, 3000);
+  };
+
+  useEffect(() => {
+      if (!isPlaying) setShowControls(true);
+      else handleInteraction();
+  }, [isPlaying]);
 
   const handleDoubleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -299,11 +320,16 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, onPl
 
       <div 
         className="absolute inset-0 z-10 cursor-pointer" 
-        onClick={togglePlay}
+        onClick={(e) => { togglePlay(); handleInteraction(); }}
+        onMouseMove={handleInteraction}
+        onTouchStart={handleInteraction}
         onDoubleClick={handleDoubleClick}
       >
-        <div className="absolute top-0 left-0 w-full h-24 bg-linear-to-b from-black/60 to-transparent flex items-center px-8 opacity-0 group-hover:opacity-100 transition-opacity">
-            <span className="text-white font-bold tracking-tight text-lg mb-4">{title}</span>
+        {/* Cinematic Blur Mask: Hides YouTube's native title and overlay when paused */}
+        <div className={cn("absolute inset-0 bg-[#011c18]/30 backdrop-blur-md transition-all duration-700 pointer-events-none", (!isPlaying && hasStarted && !hasCompleted) ? "opacity-100" : "opacity-0")} />
+
+        <div className={cn("absolute top-0 left-0 w-full pt-8 pb-24 bg-linear-to-b from-black via-black/90 to-transparent flex items-start px-8 transition-opacity duration-300 z-20 pointer-events-none", showControls ? "opacity-100" : "opacity-0")}>
+            <span className="text-white font-black tracking-tight text-xl drop-shadow-2xl">{title}</span>
         </div>
 
         {/* Video End Next Step Overlay */}
@@ -376,7 +402,15 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, onPl
                 </motion.div>
             )}
         </AnimatePresence>
-        <div className="absolute bottom-0 left-0 w-full p-6 bg-linear-to-t from-black/80 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20" onClick={(e) => e.stopPropagation()}>
+        <div 
+            className={cn(
+                "absolute bottom-0 left-0 w-full pt-20 pb-6 px-6 bg-linear-to-t from-black via-black/95 to-transparent transition-transform duration-500 z-20",
+                showControls ? "translate-y-0" : "translate-y-full"
+            )} 
+            onClick={(e) => e.stopPropagation()}
+            onMouseMove={handleInteraction}
+            onTouchStart={handleInteraction}
+        >
           <div className="relative w-full h-1.5 bg-white/20 rounded-full mb-4 overflow-hidden group/bar">
              <div className="absolute top-0 left-0 h-full bg-emerald-500 rounded-full z-10 transition-all duration-300" style={{ width: `${(currentTime / duration) * 100}%` }}></div>
              <div className="absolute top-0 left-0 h-full bg-white/10 rounded-full transition-all duration-300" style={{ width: `${(totalWatchedTime / (duration * 0.8)) * 100}%` }}></div>
@@ -395,7 +429,7 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, onPl
                     </button>
                     <input 
                         type="range" min="0" max="100" value={isMuted ? 0 : volume} onChange={handleVolumeChange}
-                        className="w-0 group-hover/vol:w-20 transition-all duration-300 h-1 bg-white/20 rounded-full accent-emerald-500"
+                        className="hidden sm:block w-0 opacity-0 group-hover/vol:w-20 group-hover/vol:opacity-100 transition-all duration-300 h-1 bg-white/20 rounded-full accent-emerald-500"
                     />
                  </div>
 
@@ -410,15 +444,15 @@ export default function YouTubeLMSPlayer({ videoId, onComplete, onProgress, onPl
                  <div className="hidden sm:flex items-center gap-2 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
                      <span className="text-[9px] font-black tracking-widest uppercase text-emerald-500">
-                        {Math.min(100, Math.floor((totalWatchedTime / (duration * 0.8)) * 100))}% Engagement
+                        {Math.min(100, Math.floor((totalWatchedTime / (duration * 0.8)) * 100))}%
                      </span>
                  </div>
                  
-                 <button onClick={toggleFullscreen} className="hover:text-emerald-400 transition-colors mr-2">
+                 <div className="hidden md:flex w-24 h-7 bg-white/5 rounded-lg items-center justify-center border border-white/10 text-[8px] font-black tracking-widest uppercase">Darul-Quran</div>
+
+                 <button onClick={toggleFullscreen} className="hover:text-emerald-400 transition-colors ml-1">
                     <Maximize size={18} />
                  </button>
-                 <span className="hidden lg:inline-block text-[8px] font-black tracking-widest uppercase text-emerald-400 border border-emerald-400/30 px-2 py-0.5 rounded">Encrypted</span>
-                 <div className="hidden md:flex w-24 h-7 bg-white/5 rounded-lg items-center justify-center border border-white/10 text-[8px] font-black tracking-widest uppercase">Darul-Quran</div>
             </div>
           </div>
         </div>
